@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='TechNexo - Catálogo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <p class="tn-kicker mb-1">02 / consulta</p>
+    <h3 class="mb-3">
+        Catálogo de productos
+        <small class="text-muted" th:if="${q}">— resultados para "<span th:text="${q}"></span>"</small>
+    </h3>
+    <div th:if="${productos.empty}" class="alert alert-info">No se encontraron productos.</div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" th:each="p : ${productos}">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${p.nombre}">Nombre</h5>
+                    <p class="card-text text-muted mb-1" th:text="${p.sku}">SKU</p>
+                    <p class="card-text" th:text="${p.descripcion}">Descripción</p>
+                    <p class="card-text"><small>Marca: <span th:text="${p.marca}"></span> |
+                        Categoría: <span th:text="${p.categoria}"></span></small></p>
+                    <p class="card-text fw-bold mb-1 tn-price" th:text="${p.precio + ' ' + p.moneda}">0.00 GTQ</p>
+                    <span class="badge" th:classappend="${p.stockDisponible > 0} ? 'bg-success' : 'bg-secondary'"
+                          th:text="${p.stockDisponible > 0 ? 'Disponible: ' + p.stockDisponible : 'Sin disponibilidad'}">Disponible</span>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{'/producto/' + ${p.id}}" class="btn btn-primary btn-sm">Ver ficha técnica</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='TechNexo - Detalle producto')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <p class="tn-kicker mb-2">03 / ficha técnica</p>
+            <h3 th:text="${producto.nombre}">Producto</h3>
+            <p class="text-muted mb-2 tn-sku">SKU: <span th:text="${producto.sku}"></span></p>
+            <p th:text="${producto.descripcion}"></p>
+
+            <h5 class="mt-4">Ficha técnica</h5>
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr><th>Atributo</th><th>Valor</th><th>Unidad</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${atributos}">
+                    <td th:text="${a.nombre}"></td>
+                    <td th:text="${a.valor}"></td>
+                    <td th:text="${a.unidad}"></td>
+                </tr>
+                <tr th:if="${atributos.empty}">
+                    <td colspan="3">Sin atributos registrados.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="tn-price" th:text="${producto.precio + ' ' + producto.moneda}">0.00 GTQ</h4>
+                    <p class="mb-1">Marca: <strong th:text="${producto.marca}"></strong></p>
+                    <p class="mb-1">Categoría: <strong th:text="${producto.categoria}"></strong></p>
+                    <p>Estado: <span class="badge bg-success" th:text="${producto.estado}"></span></p>
+                    <hr>
+                    <p class="mb-1">Stock físico: <span th:text="${producto.stockFisico}">0</span></p>
+                    <p class="mb-1">Reservadas (pendientes): <span th:text="${producto.cantidadReservada}">0</span></p>
+                    <p>Stock disponible: <strong th:text="${producto.stockDisponible}">0</strong></p>
+
+                    <div th:if="${producto.stockDisponible <= 0}" class="alert alert-warning py-2">
+                        Sin disponibilidad por el momento.
+                    </div>
+
+                    <form th:if="${producto.stockDisponible > 0}" th:action="@{/reservas/crear}" method="post">
+                        <input type="hidden" name="idProducto" th:value="${producto.id}">
+                        <div class="mb-2">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" name="cantidad" value="1" min="1"
+                                   th:max="${producto.stockDisponible}">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Identificador de cliente (opcional)</label>
+                            <input type="text" class="form-control" name="identificadorCliente"
+                                   placeholder="correo o nombre">
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Reservar</button>
+                        <small class="text-muted d-block mt-1">La reserva expira en 30 minutos.</small>
+                    </form>
+
+                    <a th:href="@{/checkout}" class="btn btn-success w-100 mt-2">Comprar ahora</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

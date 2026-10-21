@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='TechNexo - Reservas')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <p class="tn-kicker mb-1">05 / reservas</p>
+    <h3>Reservas</h3>
+    <p class="text-muted">Una reserva PENDIENTE aparta stock. Al confirmarla se descuenta el inventario y se registra una SALIDA.</p>
+
+    <div th:if="${reservas.empty}" class="alert alert-info">No hay reservas registradas.</div>
+
+    <table class="table table-bordered table-hover" th:unless="${reservas.empty}">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th><th>Producto</th><th>SKU</th><th>Cantidad</th>
+            <th>Creada</th><th>Expira</th><th>Estado</th><th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${reservas}">
+            <td th:text="${r.id}"></td>
+            <td th:text="${r.producto}"></td>
+            <td th:text="${r.sku}"></td>
+            <td th:text="${r.cantidad}"></td>
+            <td th:text="${@fecha.local(r.fechaCreacion)}"></td>
+            <td th:text="${@fecha.local(r.fechaExpiracion)}"></td>
+            <td>
+                <span class="badge"
+                      th:classappend="${r.estado == 'PENDIENTE'} ? 'bg-warning text-dark' :
+                                      (${r.estado == 'CONFIRMADA'} ? 'bg-success' : 'bg-secondary')"
+                      th:text="${r.estado}"></span>
+            </td>
+            <td>
+                <form th:if="${r.estado == 'PENDIENTE'}" th:action="@{'/reservas/' + ${r.id} + '/confirmar'}"
+                      method="post" class="d-inline">
+                    <button class="btn btn-success btn-sm">Confirmar</button>
+                </form>
+                <form th:if="${r.estado == 'PENDIENTE'}" th:action="@{'/reservas/' + ${r.id} + '/cancelar'}"
+                      method="post" class="d-inline">
+                    <button class="btn btn-outline-danger btn-sm">Cancelar</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: technexo-backend
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=TechNexoDB;encrypt=false;trustServerCertificate=true;loginTimeout=30
+    username: technexo_app
+    password: "TechNexo#2026"
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.SQLServerDialect
+  thymeleaf:
+    cache: false
+server:
+  port: 8080
+logging:
+  level:
+    org.hibernate.SQL: INFO
+    com.technexo: DEBUG

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='TechNexo - Error')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-5">
+    <p class="tn-kicker mb-2">ERR / operación</p>
+    <div class="alert alert-danger">
+        <h4>No se pudo completar</h4>
+        <p class="mb-0" th:text="${error}">Ha ocurrido un error</p>
+    </div>
+    <a href="/" class="btn btn-primary">Volver al inicio</a>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='TechNexo - Pedidos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <p class="tn-kicker mb-1">06 / pedidos</p>
+    <h3>Pedidos</h3>
+    <p class="text-muted">Cada línea conserva el precio histórico del producto en el momento de la compra.</p>
+
+    <div th:if="${pedidos.empty}" class="alert alert-info">No hay pedidos registrados.</div>
+
+    <div class="accordion" id="acordeonPedidos" th:unless="${pedidos.empty}">
+        <div class="accordion-item" th:each="p, it : ${pedidos}">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        th:attr="data-bs-target='#pedido' + ${p.id}">
+                    Pedido #<span th:text="${p.id}"></span> —
+                    <span class="ms-2 badge bg-success" th:text="${p.estado}"></span>
+                    <span class="ms-2" th:text="${p.nombreCliente}"></span>
+                    <span class="ms-2 fw-bold" th:text="${p.total + ' ' + p.moneda}"></span>
+                </button>
+            </h2>
+            <div th:id="'pedido' + ${p.id}" class="accordion-collapse collapse"
+                 data-bs-parent="#acordeonPedidos">
+                <div class="accordion-body">
+                    <p class="mb-1">Fecha: <span th:text="${@fecha.local(p.fecha)}"></span></p>
+                    <p class="mb-1">Cliente: <span th:text="${p.nombreCliente}"></span></p>
+                    <table class="table table-sm table-striped">
+                        <thead>
+                        <tr><th>SKU</th><th>Producto</th><th>Cantidad</th>
+                            <th>Precio histórico</th><th>Importe</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="i : ${p.items}">
+                            <td th:text="${i.sku}"></td>
+                            <td th:text="${i.producto}"></td>
+                            <td th:text="${i.cantidad}"></td>
+                            <td th:text="${i.precioUnitarioHistorico + ' ' + p.moneda}"></td>
+                            <td th:text="${i.importe + ' ' + p.moneda}"></td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-end">Subtotal</th>
+                            <th th:text="${p.subtotal + ' ' + p.moneda}"></th>
+                        </tr>
+                        <tr>
+                            <th colspan="4" class="text-end">Total</th>
+                            <th th:text="${p.total + ' ' + p.moneda}"></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

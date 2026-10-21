@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hospital W 2.0 &middot; Panel de Administracion</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230e7490'/%3E%3Cpath d='M12 6v12M6 12h12' stroke='white' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ===================== TOKENS ===================== */
+  :root {
+    --bg: #f4f7fb;
+    --surface: #ffffff;
+    --sidebar: #0b2545;
+    --sidebar-2: #0e3357;
+    --primary: #0e7490;
+    --primary-2: #14b8a6;
+    --primary-soft: #e6f6f8;
+    --text: #0f172a;
+    --muted: #64748b;
+    --muted-2: #94a3b8;
+    --border: #e6ecf2;
+    --danger: #e11d48;
+    --danger-soft: #ffe4ea;
+    --success: #059669;
+    --success-soft: #d1fae5;
+    --warning: #d97706;
+    --warning-soft: #fef3c7;
+    --shadow-sm: 0 1px 2px rgba(16,24,40,.06);
+    --shadow-md: 0 6px 24px -8px rgba(16,24,40,.18);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .hidden { display: none !important; }
+  svg { display: block; }
+
+  /* ===================== LOGIN ===================== */
+  #login {
+    position: fixed; inset: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(20,184,166,.35), transparent 60%),
+      radial-gradient(900px 500px at 110% 110%, rgba(14,116,144,.45), transparent 55%),
+      linear-gradient(140deg, #082032 0%, #0b2545 45%, #0e3357 100%);
+    padding: 24px;
+  }
+  .login-shell {
+    display: grid; grid-template-columns: 1.1fr .9fr;
+    width: min(920px, 100%); min-height: 480px;
+    background: #fff; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 30px 80px -20px rgba(2,16,32,.65);
+  }
+  .login-hero {
+    position: relative; padding: 44px 40px; color: #eaf6f8;
+    background: linear-gradient(150deg, #0b2545, #0e7490 130%);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .login-hero::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.12) 1px, transparent 1px);
+    background-size: 22px 22px; opacity: .5;
+  }
+  .login-hero > * { position: relative; }
+  .brand-mark {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-badge {
+    width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+    background: linear-gradient(150deg, var(--primary-2), #22d3ee);
+    box-shadow: 0 10px 24px -8px rgba(34,211,238,.8);
+  }
+  .login-hero h1 { font-size: 26px; margin: 0; letter-spacing: -.02em; }
+  .login-hero p { margin: 6px 0 0; color: #a9c6d6; font-size: 14px; }
+  .hero-points { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 14px; }
+  .hero-points li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: #cfe3ec; }
+  .hero-points .dot {
+    flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16);
+  }
+  .login-form { padding: 44px 40px; display: flex; flex-direction: column; justify-content: center; }
+  .login-form h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.02em; }
+  .login-form .sub { color: var(--muted); font-size: 14px; margin: 0 0 26px; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label { font-size: 12.5px; font-weight: 600; color: #475569; }
+  .input, .field input, .field select {
+    width: 100%; padding: 11px 13px; font-size: 14px; color: var(--text);
+    border: 1.5px solid var(--border); border-radius: 11px; background: #fff;
+    transition: border-color .15s, box-shadow .15s; font-family: inherit;
+  }
+  .input:focus, .field input:focus, .field select:focus {
+    outline: none; border-color: var(--primary-2); box-shadow: 0 0 0 4px rgba(20,184,166,.14);
+  }
+  .login-form .field { margin-bottom: 16px; }
+  .login-hint { margin-top: 18px; font-size: 12.5px; color: var(--muted); text-align: center; }
+
+  /* ===================== LAYOUT ===================== */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 264px; flex: none; color: #dbe7f3;
+    background: linear-gradient(180deg, var(--sidebar), var(--sidebar-2));
+    padding: 22px 18px; display: flex; flex-direction: column; gap: 26px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar .brand { display: flex; align-items: center; gap: 12px; padding: 0 6px; }
+  .sidebar .brand h1 { font-size: 15.5px; margin: 0; color: #fff; letter-spacing: -.01em; }
+  .sidebar .brand span { font-size: 11.5px; color: #8fb0c8; }
+  .nav { display: flex; flex-direction: column; gap: 6px; }
+  .nav-label { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #6f92ad; padding: 0 10px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 11px;
+    font-size: 14px; font-weight: 500; color: #bcd0e0; cursor: pointer;
+    border: 1px solid transparent; transition: background .15s, color .15s, border-color .15s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-item.active {
+    background: linear-gradient(120deg, rgba(20,184,166,.22), rgba(14,116,144,.28));
+    color: #fff; border-color: rgba(45,212,191,.35);
+  }
+  .nav-item .nav-ico { width: 18px; height: 18px; }
+  .sidebar .side-foot {
+    margin-top: auto; border-top: 1px solid rgba(255,255,255,.09); padding-top: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 12px; flex: none; display: grid; place-items: center;
+    font-weight: 700; font-size: 14px; color: #04222b;
+    background: linear-gradient(150deg, #2dd4bf, #67e8f9);
+  }
+  .side-foot .who { line-height: 1.25; overflow: hidden; }
+  .side-foot .who b { color: #fff; font-size: 13.5px; display: block; }
+  .side-foot .who small { color: #8fb0c8; font-size: 11.5px; }
+  .logout {
+    margin-left: auto; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.13);
+    color: #dbe7f3; border-radius: 10px; padding: 8px 10px; cursor: pointer; display: grid; place-items: center;
+  }
+  .logout:hover { background: rgba(255,255,255,.16); }
+
+  .main { flex: 1; min-width: 0; }
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(244,247,251,.85); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 30px; display: flex; align-items: center; gap: 16px;
+  }
+  .topbar h2 { margin: 0; font-size: 20px; letter-spacing: -.02em; }
+  .topbar .sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .topbar .date-chip {
+    margin-left: auto; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+    background: #fff; border: 1px solid var(--border); border-radius: 11px; padding: 8px 13px;
+    font-size: 13px; color: var(--muted); box-shadow: var(--shadow-sm);
+  }
+  .content { padding: 26px 30px 60px; }
+
+  /* ===================== CARDS / GRID ===================== */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 22px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+  }
+  .stat::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: linear-gradient(180deg, var(--primary-2), var(--primary));
+  }
+  .stat .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .stat .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; }
+  .ico.teal { background: var(--primary-soft); color: var(--primary); }
+  .ico.blue { background: #e0f2fe; color: #0369a1; }
+  .ico.amber { background: var(--warning-soft); color: var(--warning); }
+  .ico.rose { background: var(--danger-soft); color: var(--danger); }
+  .stat .num { font-size: 30px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .stat .lbl { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); margin-bottom: 22px; overflow: hidden;
+  }
+  .card-head {
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .card-head h3 { margin: 0; font-size: 15.5px; letter-spacing: -.01em; }
+  .card-head .desc { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+  .card-head .icon-chip {
+    width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+    background: var(--primary-soft); color: var(--primary); flex: none;
+  }
+  .card-body { padding: 22px; }
+  .count-badge {
+    margin-left: auto; background: var(--primary-soft); color: var(--primary);
+    font-size: 12.5px; font-weight: 700; padding: 5px 11px; border-radius: 999px;
+  }
+
+  form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end; }
+  .field.check { flex-direction: row; align-items: center; gap: 9px; padding-bottom: 11px; }
+  .field.check input { width: auto; }
+  .field.check label { font-size: 13.5px; color: var(--text); font-weight: 500; }
+  .actions-row { margin-top: 16px; display: flex; gap: 10px; }
+
+  .btn {
+    border: none; border-radius: 11px; padding: 11px 18px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 8px;
+    transition: transform .05s, box-shadow .15s, background .15s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: linear-gradient(120deg, var(--primary), var(--primary-2)); color: #fff;
+    box-shadow: 0 8px 20px -8px rgba(14,116,144,.75);
+  }
+  .btn-primary:hover { box-shadow: 0 10px 24px -8px rgba(14,116,144,.95); }
+  .btn-ghost { background: #eef2f7; color: #334155; }
+
+  /* ===================== TABLE ===================== */
+  .toolbar { padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; }
+  .search {
+    flex: 1; max-width: 380px; display: flex; align-items: center; gap: 9px;
+    background: #f8fafc; border: 1.5px solid var(--border); border-radius: 11px; padding: 9px 12px;
+  }
+  .search input { border: none; background: transparent; outline: none; font-size: 13.5px; width: 100%; font-family: inherit; color: var(--text); }
+  .search svg { color: var(--muted-2); flex: none; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    text-align: left; padding: 12px 16px; background: #f8fafc; color: var(--muted);
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 13px 16px; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f8fbfd; }
+  .cell-person { display: flex; align-items: center; gap: 11px; }
+  .cell-person .avatar {
+    width: 34px; height: 34px; border-radius: 10px; font-size: 12px;
+  }
+  .cell-person b { display: block; font-size: 13.5px; }
+  .cell-person small { color: var(--muted); font-size: 12px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .badge.on { background: var(--success-soft); color: var(--success); }
+  .badge.off { background: var(--danger-soft); color: var(--danger); }
+  .badge.info { background: #e0f2fe; color: #0369a1; }
+  .badge.warn { background: var(--warning-soft); color: var(--warning); }
+  .badge.muted { background: #eef2f7; color: #475569; }
+  .dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  .icon-btn {
+    border: 1px solid var(--border); background: #fff; border-radius: 10px; width: 34px; height: 34px;
+    display: grid; place-items: center; cursor: pointer; color: var(--muted); transition: all .15s;
+  }
+  .icon-btn:hover { background: var(--danger-soft); border-color: #fecdd3; color: var(--danger); }
+  .empty { text-align: center; color: var(--muted); padding: 34px 16px; font-size: 13.5px; }
+  .empty svg { margin: 0 auto 10px; color: var(--muted-2); }
+
+  /* ===================== DASHBOARD EXTRA ===================== */
+  .hero-card {
+    background: linear-gradient(130deg, #0b2545, #0e7490 135%); color: #eaf6f8;
+    border-radius: var(--radius); padding: 26px 28px; margin-bottom: 22px; box-shadow: var(--shadow-md);
+    position: relative; overflow: hidden;
+  }
+  .hero-card::after {
+    content: ""; position: absolute; right: -40px; top: -40px; width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,212,191,.4), transparent 70%);
+  }
+  .hero-card h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.02em; position: relative; }
+  .hero-card p { margin: 0; color: #b6d3e0; font-size: 14px; position: relative; max-width: 620px; }
+  .quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .quick .q {
+    border: 1px solid var(--border); background: #fff; border-radius: 14px; padding: 16px;
+    display: flex; gap: 13px; align-items: center; cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: transform .12s, box-shadow .15s;
+  }
+  .quick .q:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .quick .q b { display: block; font-size: 14px; }
+  .quick .q small { color: var(--muted); font-size: 12px; }
+
+  /* ===================== TOAST ===================== */
+  #toast {
+    position: fixed; right: 22px; bottom: 22px; z-index: 80; max-width: 400px;
+    padding: 14px 16px; border-radius: 12px; color: #fff; font-size: 13.5px; line-height: 1.45;
+    box-shadow: 0 18px 40px -12px rgba(2,16,32,.5); display: none; white-space: pre-line;
+    border-left: 4px solid rgba(255,255,255,.4);
+  }
+  #toast.ok { background: #065f46; }
+  #toast.err { background: #9f1239; }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 980px) {
+    .login-shell { grid-template-columns: 1fr; min-height: unset; }
+    .login-hero { display: none; }
+    .sidebar { width: 76px; padding: 18px 12px; }
+    .sidebar .brand h1, .sidebar .brand span, .nav-item span, .nav-label, .side-foot .who { display: none; }
+    .nav-item { justify-content: center; }
+    .side-foot { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login">
+  <div class="login-shell">
+    <div class="login-hero">
+      <div class="brand-mark">
+        <div class="logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#04222b" stroke-width="2.4" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>
+        </div>
+        <div>
+          <h1>Hospital W 2.0</h1>
+          <p>Sistema de gestion hospitalaria</p>
+        </div>
+      </div>
+      <ul class="hero-points">
+        <li><span class="dot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7fe3e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><b>Pacientes</b><br />Registro y control de pacientes.</div></li>
+        <li><span class="dot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7fe3e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Personal</b><br />Administracion de empleados y turnos.</div></li>
+        <li><span class="dot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7fe3e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg></span><div><b>Insumos</b><br />Control de inventario y suministros.</div></li>
+      </ul>
+    </div>
+
+    <div class="login-form">
+      <h2>Bienvenido</h2>
+      <p class="sub">Ingrese sus credenciales de administrador.</p>
+      <div class="field">
+        <label for="login-user">Usuario</label>
+        <input id="login-user" value="admin" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="login-pass">Clave</label>
+        <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px" onclick="doLogin()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5M15 12H3"/></svg>
+        Iniciar sesion
+      </button>
+      <p class="login-hint">Acceso restringido &middot; Solo personal autorizado</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app" class="app-shell hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo-badge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#04222b" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>
+      </div>
+      <div>
+        <h1>Hospital W 2.0</h1>
+        <span>Panel de administracion</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Navegacion</div>
+      <div class="nav-item" data-view="dashboard" onclick="showView('dashboard')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Resumen</span>
+      </div>
+      <div class="nav-item active" data-view="pacientes" onclick="showView('pacientes')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Pacientes</span>
+      </div>
+      <div class="nav-item" data-view="empleados" onclick="showView('empleados')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Empleados</span>
+      </div>
+      <div class="nav-item" data-view="insumos" onclick="showView('insumos')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg>
+        <span>Insumos</span>
+      </div>
+    </nav>
+
+    <div class="side-foot">
+      <div class="avatar" id="user-initials">AD</div>
+      <div class="who">
+        <b id="whoami">Administrador</b>
+        <small>Administrador del sistema</small>
+      </div>
+      <button class="logout" title="Cerrar sesion" onclick="doLogout()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h2 id="page-title">Pacientes</h2>
+        <p class="sub" id="page-sub">Gestion de pacientes registrados</p>
+      </div>
+      <div class="date-chip">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span id="today-label"></span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section id="view-dashboard" class="view hidden">
+        <div class="hero-card">
+          <h2>Bienvenido al panel de administracion</h2>
+          <p>Desde aqui puede registrar y eliminar pacientes, empleados e insumos del hospital. Seleccione un modulo para comenzar.</p>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="head"><div class="ico teal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
+            <div class="num" id="stat-pacientes">0</div>
+            <div class="lbl">Pacientes registrados</div>
+          </div>
+          <div class="stat">
+            <div class="head"><div class="ico blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></div></div>
+            <div class="num" id="stat-empleados">0</div>
+            <div class="lbl">Empleados <span id="stat-empleados-activos" style="color:var(--success)"></span></div>
+          </div>
+          <div class="stat">
+            <div class="head"><div class="ico amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg></div></div>
+            <div class="num" id="stat-insumos">0</div>
+            <div class="lbl">Insumos en inventario</div>
+          </div>
+          <div class="stat">
+            <div class="head"><div class="ico rose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div></div>
+            <div class="num" id="stat-stock-bajo">0</div>
+            <div class="lbl">Insumos con stock bajo</div>
+          </div>
+        </div>
+
+        <div class="quick">
+          <div class="q" onclick="showView('pacientes')"><div class="ico teal" style="width:40px;height:40px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><div><b>Registrar paciente</b><small>Modulo de pacientes</small></div></div>
+          <div class="q" onclick="showView('empleados')"><div class="ico blue" style="width:40px;height:40px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><div><b>Registrar empleado</b><small>Modulo de personal</small></div></div>
+          <div class="q" onclick="showView('insumos')"><div class="ico amber" style="width:40px;height:40px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><div><b>Registrar insumo</b><small>Modulo de inventario</small></div></div>
+        </div>
+      </section>
+
+      <!-- ============ PACIENTES ============ -->
+      <section id="view-pacientes" class="view">
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-chip"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div><h3>Ingresar paciente</h3><p class="desc">Todos los campos son obligatorios.</p></div>
+          </div>
+          <div class="card-body">
+            <form class="grid" onsubmit="crearPaciente(event)">
+              <div class="field"><label>DPI</label><input name="dpi" required /></div>
+              <div class="field"><label>Nombre</label><input name="nombre" required /></div>
+              <div class="field"><label>Apellido</label><input name="apellido" required /></div>
+              <div class="field"><label>Fecha de nacimiento</label><input name="fecha_nacimiento" type="date" required /></div>
+              <div class="field"><label>Genero</label><select name="genero" id="sel-genero" required></select></div>
+              <div class="field"><label>Direccion</label><input name="direccion" required /></div>
+              <div class="field"><label>Telefono</label><input name="telefono" required /></div>
+              <div class="field"><label>Familiar responsable</label><select name="id_familiar" id="sel-familiar" required></select></div>
+              <div class="field"><label>Medico externo</label><select name="id_medico_externo" id="sel-medico" required></select></div>
+              <div class="field check"><input type="checkbox" name="es_adulto_mayor" id="chk-adulto" /><label for="chk-adulto">Adulto mayor</label></div>
+              <div class="actions-row" style="margin:0"><button class="btn btn-primary" type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Guardar paciente</button></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-chip"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+            <div><h3>Pacientes registrados</h3><p class="desc">Eliminar un paciente borra tambien sus citas y hospitalizaciones.</p></div>
+            <span class="count-badge" id="count-pacientes">0</span>
+          </div>
+          <div class="toolbar">
+            <label class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <input placeholder="Buscar por nombre, apellido o DPI..." oninput="filtrar('pacientes', this.value)" />
+            </label>
+          </div>
+          <div class="table-wrap"><table id="tbl-pacientes"></table></div>
+        </div>
+      </section>
+
+      <!-- ============ EMPLEADOS ============ -->
+      <section id="view-empleados" class="view hidden">
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-chip"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div><h3>Ingresar empleado</h3><p class="desc">La especialidad es opcional.</p></div>
+          </div>
+          <div class="card-body">
+            <form class="grid" onsubmit="crearEmpleado(event)">
+              <div class="field"><label>NSS</label><input name="nss" required /></div>
+              <div class="field"><label>Nombre</label><input name="nombre" required /></div>
+              <div class="field"><label>Apellido</label><input name="apellido" required /></div>
+              <div class="field"><label>Rol</label><select name="rol" id="sel-rol" required></select></div>
+              <div class="field"><label>Turno</label><select name="id_turno" id="sel-turno" required></select></div>
+              <div class="field"><label>Especialidad</label><select name="id_especialidad" id="sel-especialidad"></select></div>
+              <div class="field check"><input type="checkbox" name="estado_activo" id="chk-activo" checked /><label for="chk-activo">Activo</label></div>
+              <div class="actions-row" style="margin:0"><button class="btn btn-primary" type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Guardar empleado</button></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-chip"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+            <div><h3>Empleados registrados</h3><p class="desc">Eliminar un empleado borra tambien sus citas y asignaciones.</p></div>
+            <span class="count-badge" id="count-empleados">0</span>
+          </div>
+          <div class="toolbar">
+            <label class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <input placeholder="Buscar por nombre, NSS o rol..." oninput="filtrar('empleados', this.value)" />
+            </label>
+          </div>
+          <div class="table-wrap"><table id="tbl-empleados"></table></div>
+        </div>
+      </section>
+
+      <!-- ============ INSUMOS ============ -->
+      <section id="view-insumos" class="view hidden">
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-chip"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div><h3>Ingresar insumo</h3><p class="desc">El stock no puede superar el maximo.</p></div>
+          </div>
+          <div class="card-body">
+            <form class="grid" onsubmit="crearInsumo(event)">
+              <div class="field"><label>Codigo</label><input name="codigo_insumo" required /></div>
+              <div class="field"><label>Nombre</label><input name="nombre_insumo" required /></div>
+              <div class="field"><label>Tipo</label><input name="tipo_insumo" required /></div>
+              <div class="field"><label>Stock existencia</label><input name="stock_existencia" type="number" step="0.01" min="0" value="0" required /></div>
+              <div class="field"><label>Stock maximo</label><input name="stock_maximo" type="number" step="0.01" min="0.01" required /></div>
+              <div class="field"><label>Costo unitario</label><input name="costo_unitario" type="number" step="0.01" min="0" required /></div>
+              <div class="field"><label>Proveedor</label><select name="id_proveedor" id="sel-proveedor" required></select></div>
+              <div class="actions-row" style="margin:0"><button class="btn btn-primary" type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Guardar insumo</button></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-chip"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+            <div><h3>Insumos registrados</h3><p class="desc">Inventario y suministros disponibles.</p></div>
+            <span class="count-badge" id="count-insumos">0</span>
+          </div>
+          <div class="toolbar">
+            <label class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <input placeholder="Buscar por nombre, codigo o proveedor..." oninput="filtrar('insumos', this.value)" />
+            </label>
+          </div>
+          <div class="table-wrap"><table id="tbl-insumos"></table></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = (sel) => document.querySelector(sel);
+
+const state = {
+  view: "pacientes",
+  pacientes: [],
+  empleados: [],
+  insumos: [],
+  filtros: { pacientes: "", empleados: "", insumos: "" },
+};
+
+const TITLES = {
+  dashboard: ["Resumen general", "Vista general del sistema"],
+  pacientes: ["Pacientes", "Gestion de pacientes registrados"],
+  empleados: ["Empleados", "Administracion del personal del hospital"],
+  insumos: ["Insumos", "Control de inventario y suministros"],
+};
+
+// ------------------------------------------------------------------ utils
+function escapeHtml(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function initials(a, b) {
+  return ((a || "?").trim().charAt(0) + (b || "").trim().charAt(0)).toUpperCase();
+}
+function toast(msg, ok = true) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = ok ? "ok" : "err";
+  t.style.display = "block";
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => (t.style.display = "none"), 5200);
+}
+async function api(path, options = {}) {
+  const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...options });
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error(data.error || ("Error HTTP " + res.status));
+  return data;
+}
+
+// ------------------------------------------------------------------ login
+async function doLogin() {
+  try {
+    const data = await api("/api/login", {
+      method: "POST",
+      body: JSON.stringify({ usuario: $("#login-user").value, clave: $("#login-pass").value }),
+    });
+    await enterApp(data.user);
+  } catch (e) { toast(e.message, false); }
+}
+async function doLogout() {
+  await api("/api/logout", { method: "POST" });
+  $("#app").classList.add("hidden");
+  $("#login").classList.remove("hidden");
+}
+async function enterApp(user) {
+  $("#login").classList.add("hidden");
+  $("#app").classList.remove("hidden");
+  $("#whoami").textContent = user;
+  $("#user-initials").textContent = (user || "AD").substring(0, 2).toUpperCase();
+  $("#today-label").textContent = new Date().toLocaleDateString("es-GT", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
+  });
+  await cargarCatalogos();
+  await cargarTodo();
+  showView("dashboard");
+}
+
+// ------------------------------------------------------------------ navegacion
+function showView(name) {
+  state.view = name;
+  document.querySelectorAll(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.view === name));
+  document.querySelectorAll(".view").forEach((v) => v.classList.toggle("hidden", v.id !== "view-" + name));
+  const [t, s] = TITLES[name] || ["", ""];
+  $("#page-title").textContent = t;
+  $("#page-sub").textContent = s;
+}
+
+// ------------------------------------------------------------------ catalogos
+async function cargarCatalogos() {
+  const c = await api("/api/catalogos");
+  llenarSelect($("#sel-genero"), c.generos.map((g) => ({ v: g, t: g })));
+  llenarSelect($("#sel-rol"), c.roles.map((r) => ({ v: r, t: r })));
+  llenarSelect($("#sel-familiar"), c.familiares.map((f) => ({ v: f.id_familiar, t: f.nombre_completo })), "-- seleccione --");
+  llenarSelect($("#sel-medico"), c.medicos.map((m) => ({ v: m.id_medico_externo, t: m.nombre_completo })), "-- seleccione --");
+  llenarSelect($("#sel-turno"), c.turnos.map((t) => ({ v: t.id_turno, t: t.nombre_turno })), "-- seleccione --");
+  llenarSelect($("#sel-especialidad"), c.especialidades.map((e) => ({ v: e.id_especialidad, t: e.nombre_especialidad })), "(sin especialidad)");
+  llenarSelect($("#sel-proveedor"), c.proveedores.map((p) => ({ v: p.id_proveedor, t: p.razon_social })), "-- seleccione --");
+}
+function llenarSelect(sel, items, vacio) {
+  sel.innerHTML = "";
+  if (vacio !== undefined) {
+    const o = document.createElement("option");
+    o.value = ""; o.textContent = vacio;
+    sel.appendChild(o);
+  }
+  items.forEach((it) => {
+    const o = document.createElement("option");
+    o.value = it.v; o.textContent = it.t;
+    sel.appendChild(o);
+  });
+}
+
+// ------------------------------------------------------------------ carga de datos
+async function cargarTodo() {
+  const [p, e, i] = await Promise.all([
+    api("/api/pacientes"), api("/api/empleados"), api("/api/insumos"),
+  ]);
+  state.pacientes = p; state.empleados = e; state.insumos = i;
+  renderPacientes(); renderEmpleados(); renderInsumos(); renderResumen();
+}
+
+function filtrar(tipo, valor) {
+  state.filtros[tipo] = valor.toLowerCase().trim();
+  if (tipo === "pacientes") renderPacientes();
+  if (tipo === "empleados") renderEmpleados();
+  if (tipo === "insumos") renderInsumos();
+}
+function coincide(fila, campos) {
+  const f = state.filtros;
+  const q = f[fila._tipo];
+  if (!q) return true;
+  return campos.some((c) => String(c ?? "").toLowerCase().includes(q));
+}
+
+function tabla(selector, filas, columnas, tipo, idKey) {
+  const t = $(selector);
+  if (!filas.length) {
+    t.innerHTML = `<tbody><tr><td colspan="${columnas.length + 1}"><div class="empty">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      Sin registros que mostrar.</div></td></tr></tbody>`;
+    return;
+  }
+  const head = columnas.map((c) => `<th>${c.titulo}</th>`).join("") + "<th style='text-align:right'>Acciones</th>";
+  const body = filas.map((f) => {
+    const celdas = columnas.map((c) => `<td>${c.valor(f)}</td>`).join("");
+    return `<tr>${celdas}<td style="text-align:right"><button class="icon-btn" title="Eliminar" onclick="eliminar('${tipo}', ${f[idKey]})">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </button></td></tr>`;
+  }).join("");
+  t.innerHTML = `<thead><tr>${head}</tr></thead><tbody>${body}</tbody>`;
+}
+
+function persona(nombre, apellido, sub) {
+  return `<div class="cell-person"><div class="avatar">${escapeHtml(initials(nombre, apellido))}</div>
+    <div><b>${escapeHtml(nombre)} ${escapeHtml(apellido)}</b><small>${escapeHtml(sub)}</small></div></div>`;
+}
+
+function renderPacientes() {
+  const datos = state.pacientes.map((f) => ({ ...f, _tipo: "pacientes" }))
+    .filter((f) => coincide(f, [f.nombre, f.apellido, f.dpi]));
+  $("#count-pacientes").textContent = state.pacientes.length;
+  tabla("#tbl-pacientes", datos, [
+    { titulo: "Paciente", valor: (f) => persona(f.nombre, f.apellido, "DPI " + f.dpi) },
+    { titulo: "Nacimiento", valor: (f) => f.fecha_nacimiento || "" },
+    { titulo: "Genero", valor: (f) => `<span class="badge info">${escapeHtml(f.genero)}</span>` },
+    { titulo: "Telefono", valor: (f) => escapeHtml(f.telefono) },
+    { titulo: "Adulto mayor", valor: (f) => f.es_adulto_mayor ? '<span class="badge on"><span class="dot"></span>Si</span>' : '<span class="badge muted">No</span>' },
+    { titulo: "Familiar", valor: (f) => escapeHtml(f.familiar) },
+    { titulo: "Medico ext.", valor: (f) => escapeHtml(f.medico_externo) },
+    { titulo: "Citas", valor: (f) => `<span class="badge muted">${f.citas}</span>` },
+    { titulo: "Hosp.", valor: (f) => `<span class="badge muted">${f.hospitalizaciones}</span>` },
+  ], "pacientes", "id_paciente");
+}
+
+function renderEmpleados() {
+  const datos = state.empleados.map((f) => ({ ...f, _tipo: "empleados" }))
+    .filter((f) => coincide(f, [f.nombre, f.apellido, f.nss, f.rol]));
+  $("#count-empleados").textContent = state.empleados.length;
+  tabla("#tbl-empleados", datos, [
+    { titulo: "Empleado", valor: (f) => persona(f.nombre, f.apellido, "NSS " + f.nss) },
+    { titulo: "Rol", valor: (f) => `<span class="badge info">${escapeHtml(f.rol)}</span>` },
+    { titulo: "Turno", valor: (f) => escapeHtml(f.nombre_turno) },
+    { titulo: "Especialidad", valor: (f) => escapeHtml(f.nombre_especialidad) },
+    { titulo: "Estado", valor: (f) => f.estado_activo ? '<span class="badge on"><span class="dot"></span>Activo</span>' : '<span class="badge off"><span class="dot"></span>Inactivo</span>' },
+    { titulo: "Citas", valor: (f) => `<span class="badge muted">${f.citas}</span>` },
+    { titulo: "Asign.", valor: (f) => `<span class="badge muted">${f.asignaciones}</span>` },
+  ], "empleados", "id_empleado");
+}
+
+function renderInsumos() {
+  const datos = state.insumos.map((f) => ({ ...f, _tipo: "insumos" }))
+    .filter((f) => coincide(f, [f.nombre_insumo, f.codigo_insumo, f.proveedor, f.tipo_insumo]));
+  $("#count-insumos").textContent = state.insumos.length;
+  tabla("#tbl-insumos", datos, [
+    { titulo: "Insumo", valor: (f) => `<div><b>${escapeHtml(f.nombre_insumo)}</b><br><small style="color:var(--muted)">${escapeHtml(f.codigo_insumo)} &middot; ${escapeHtml(f.tipo_insumo)}</small></div>` },
+    { titulo: "Existencia", valor: (f) => stockBadge(f) },
+    { titulo: "Maximo", valor: (f) => f.stock_maximo },
+    { titulo: "Costo", valor: (f) => "Q " + Number(f.costo_unitario).toFixed(2) },
+    { titulo: "Proveedor", valor: (f) => escapeHtml(f.proveedor) },
+  ], "insumos", "id_insumo");
+}
+
+function stockBadge(f) {
+  const ex = Number(f.stock_existencia), mx = Number(f.stock_maximo) || 1;
+  const bajo = ex <= mx * 0.25;
+  return `<span class="badge ${bajo ? "warn" : "on"}"><span class="dot"></span>${ex}</span>`;
+}
+
+function renderResumen() {
+  $("#stat-pacientes").textContent = state.pacientes.length;
+  $("#stat-empleados").textContent = state.empleados.length;
+  const activos = state.empleados.filter((e) => e.estado_activo).length;
+  $("#stat-empleados-activos").textContent = "(" + activos + " activos)";
+  $("#stat-insumos").textContent = state.insumos.length;
+  const bajos = state.insumos.filter((i) => Number(i.stock_existencia) <= (Number(i.stock_maximo) || 1) * 0.25).length;
+  $("#stat-stock-bajo").textContent = bajos;
+}
+
+// ------------------------------------------------------------------ crear
+function datosForm(form) {
+  const d = {};
+  new FormData(form).forEach((v, k) => (d[k] = v));
+  form.querySelectorAll('input[type="checkbox"]').forEach((cb) => (d[cb.name] = cb.checked));
+  return d;
+}
+async function crearPaciente(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  try {
+    await api("/api/pacientes", { method: "POST", body: JSON.stringify(datosForm(form)) });
+    toast("Paciente ingresado correctamente.");
+    form.reset();
+    state.pacientes = await api("/api/pacientes");
+    renderPacientes(); renderResumen();
+  } catch (e) { toast("No se pudo ingresar el paciente:\n" + e.message, false); }
+}
+async function crearEmpleado(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  try {
+    await api("/api/empleados", { method: "POST", body: JSON.stringify(datosForm(form)) });
+    toast("Empleado ingresado correctamente.");
+    form.reset(); $("#chk-activo").checked = true;
+    state.empleados = await api("/api/empleados");
+    renderEmpleados(); renderResumen();
+  } catch (e) { toast("No se pudo ingresar el empleado:\n" + e.message, false); }
+}
+async function crearInsumo(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  try {
+    await api("/api/insumos", { method: "POST", body: JSON.stringify(datosForm(form)) });
+    toast("Insumo ingresado correctamente.");
+    form.reset();
+    state.insumos = await api("/api/insumos");
+    renderInsumos(); renderResumen();
+  } catch (e) { toast("No se pudo ingresar el insumo:\n" + e.message, false); }
+}
+
+// ------------------------------------------------------------------ eliminar
+async function eliminar(tipo, id) {
+  if (!confirm("¿Seguro que deseas eliminar el registro #" + id + "?\nEsta accion no se puede deshacer.")) return;
+  try {
+    const r = await api("/api/" + tipo + "/" + id, { method: "DELETE" });
+    toast(r.detalle || "Registro eliminado.");
+    if (tipo === "pacientes") { state.pacientes = await api("/api/pacientes"); renderPacientes(); }
+    if (tipo === "empleados") { state.empleados = await api("/api/empleados"); renderEmpleados(); }
+    if (tipo === "insumos") { state.insumos = await api("/api/insumos"); renderInsumos(); }
+    renderResumen();
+  } catch (e) { toast("No se pudo eliminar:\n" + e.message, false); }
+}
+
+// ------------------------------------------------------------------ inicio
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !$("#login").classList.contains("hidden")) doLogin();
+});
+(async function init() {
+  try {
+    const me = await api("/api/me");
+    if (me.user) await enterApp(me.user);
+  } catch (e) { /* muestra login */ }
+})();
+</script>
+</body>
+</html>

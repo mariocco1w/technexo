@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='TechNexo - Inventario')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <p class="tn-kicker mb-1">07 / inventario</p>
+    <h3>Inventario</h3>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card mb-4">
+                <div class="card-header">Registrar ingreso de producto</div>
+                <div class="card-body">
+                    <form th:action="@{/inventario/entrada}" method="post">
+                        <div class="mb-2">
+                            <label class="form-label">Producto</label>
+                            <select class="form-select" name="idProducto" required>
+                                <option th:each="p : ${productos}" th:value="${p.id}"
+                                        th:text="${p.sku + ' - ' + p.nombre}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Cantidad a ingresar</label>
+                            <input type="number" class="form-control" name="cantidad" value="1" min="1" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Motivo</label>
+                            <input type="text" class="form-control" name="motivo"
+                                   placeholder="Compra a proveedor, reposición...">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Referencia</label>
+                            <input type="text" class="form-control" name="referencia"
+                                   placeholder="Factura / orden de compra">
+                        </div>
+                        <button class="btn btn-primary w-100">Registrar ENTRADA</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card mb-4">
+                <div class="card-header">Existencias actuales</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead class="table-light">
+                        <tr><th>Producto</th><th>Stock actual</th><th>Stock mínimo</th><th>Ubicación</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="i : ${inventario}">
+                            <td th:text="${i.sku + ' - ' + i.nombre}"></td>
+                            <td th:text="${i.stockActual}"></td>
+                            <td th:text="${i.stockMinimo}"></td>
+                            <td th:text="${i.ubicacion}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5>Movimientos de inventario (más recientes primero)</h5>
+    <div th:if="${movimientos.empty}" class="alert alert-info">Sin movimientos registrados.</div>
+    <table class="table table-bordered table-hover" th:unless="${movimientos.empty}">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th><th>Producto</th><th>Tipo</th><th>Cantidad</th>
+            <th>Fecha</th><th>Motivo</th><th>Referencia</th><th>Registró</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${movimientos}">
+            <td th:text="${m.id}"></td>
+            <td th:text="${m.sku + ' - ' + m.producto}"></td>
+            <td>
+                <span class="badge"
+                      th:classappend="${m.tipoMovimiento == 'ENTRADA'} ? 'bg-success' : 'bg-danger'"
+                      th:text="${m.tipoMovimiento}"></span>
+            </td>
+            <td th:text="${m.cantidad}"></td>
+            <td th:text="${@fecha.local(m.fecha)}"></td>
+            <td th:text="${m.motivo}"></td>
+            <td th:text="${m.referencia}"></td>
+            <td th:text="${m.creadoPor}"></td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

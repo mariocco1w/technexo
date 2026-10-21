@@ -1,0 +1,33 @@
+﻿Changed database context to 'TechNexoDB'.
+ESTADO INICIAL - TNX-SW-024
+TNX-SW-024 Switch administrable de 24 puertos Gigabit 8 0 8 1250.00 GTQ ACTIVO
+PRUEBA 1 - RESERVA CREADA
+1 1 2 PENDIENTE 2026-10-13 15:15:20 2026-10-13 14:45:20.5145186
+PRUEBA 1 - DISPONIBILIDAD DESPUÃ%S DE RESERVAR
+8 2 6
+PRUEBA 1 OK: Reserva PENDIENTE creada. Disponibilidad recalculada correctamente.
+PRUEBA 2 - RESULTADOS
+8 3 5 1
+PRUEBA 2 - ÃsLTIMO MOVIMIENTO
+1 1 SALIDA 3 ConfirmaciÃ³n de reserva RES-2 2026-10-13 14:45:21 SCRIPT-PRUEBAS
+PRUEBA 2 OK: CONFIRMADA -> Inventario descontado + Movimiento SALIDA registrado.
+PRUEBA 3 - RESULTADOS
+8 5 13
+PRUEBA 3 - MOVIMIENTO CREADO
+2 1 ENTRADA 5 Registro de ingreso de producto (prueba) ING-PRUEBA-001 2026-10-13 14:45:21 SCRIPT-PRUEBAS
+PRUEBA 3 OK: ENTRADA registrada + stock_actual incrementado correctamente.
+PRUEBA 4 - PEDIDO CREADO
+1 PAGADO 2500.00 2500.00 GTQ CLIENTE-PAGO 2026-10-13 14:45:21
+PRUEBA 4 - DETALLE CON PRECIO HISTÃ"RICO
+1 1 1 2 1250.00
+PRUEBA 4 - INVENTARIO/MOVIMIENTO
+8 2 6
+PRUEBA 4 - VERIFICACIÃ"N PRECIO HISTÃ"RICO (POST CAMBIO CATÃ?LOGO)
+1250.00 1350.00
+PRUEBA 4 OK: Pedido PAGADO + detalle con precio histÃ³rico + afectaciÃ³n inventario + movimiento SALIDA. Precio histÃ³rico se conserva.
+Msg 156, Level 15, State 1, Server DESKTOP-PVJFI3M\SQLEXPRESS, Line 17
+Incorrect syntax near the keyword 'AS'.
+RESUMEN FINAL - ESTADO ACTUAL TNX-SW-024 (SIN CAMBIOS)
+TNX-SW-024 Switch administrable de 24 puertos Gigabit 8 0 8 1250.00 GTQ ACTIVO
+Todas las pruebas ejecutadas con ROLLBACK. No se modificaron datos permanentes.
+Flujos validados: Reserva PENDIENTE -> ConfirmaciÃ³n (descuento+SALIDA), INGRESO (incremento+ENTRADA), Pedido/Pago (precio histÃ³rico + afectaciÃ³n).
