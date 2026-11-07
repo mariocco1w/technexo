@@ -28,4 +28,9 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
             "   OR LOWER(m.nombre) LIKE LOWER(CONCAT('%', :q, '%')) " +
             "ORDER BY p.nombre")
     List<Producto> buscarPorTexto(@Param("q") String q);
+
+    long countByEstado(String estado);
+
+    @Query("SELECT p FROM Producto p JOIN FETCH p.marca m JOIN FETCH p.categoria c ORDER BY p.nombre")
+    List<Producto> findTodosConRelaciones();
 }

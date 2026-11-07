@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Mis reservas - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">mis reservas</p>
+    <h1>Reservas de esta cuenta</h1>
+    <p th:if="${reservas.empty}">No tienes reservas.</p>
+    <div class="tn-table-wrap" th:unless="${reservas.empty}">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>ID</th><th>Producto</th><th>SKU</th><th>Cantidad</th><th>Expira</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${reservas}">
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.producto}"></td>
+                <td th:text="${r.sku}"></td>
+                <td th:text="${r.cantidad}"></td>
+                <td th:text="${@fecha.local(r.fechaExpiracion)}"></td>
+                <td th:text="${r.estado}"></td>
+                <td>
+                    <form th:if="${r.estado == 'PENDIENTE'}" th:action="@{'/cuenta/reservas/' + ${r.id} + '/cancelar'}" method="post">
+                        <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Administración - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">administración</p>
+    <h1>Resumen</h1>
+    <p class="mb-3">
+        <a href="/admin/productos">Productos</a> ·
+        <a href="/admin/categorias">Categorías</a> ·
+        <a href="/admin/inventario">Inventario</a> ·
+        <a href="/admin/reservas">Reservas</a> ·
+        <a href="/admin/pedidos">Pedidos</a> ·
+        <a href="/admin/usuarios">Usuarios</a>
+    </p>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Productos</span><strong th:text="${totalProductos}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Activos</span><strong th:text="${productosActivos}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Con existencia</span><strong th:text="${disponibles}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Inventario bajo</span><strong th:text="${stockBajo}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Reservas</span><strong th:text="${totalReservas}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Reservas pendientes</span><strong th:text="${reservasPendientes}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Pedidos</span><strong th:text="${totalPedidos}">0</strong></div></div>
+        <div class="col-6 col-lg-3"><div class="tn-stat"><span>Pedidos pendientes</span><strong th:text="${pedidosPendientes}">0</strong></div></div>
+    </div>
+    <section class="mb-4" th:if="${entradas + salidas > 0}">
+        <h2 class="h5">Movimientos registrados</h2>
+        <p>Entradas: <strong th:text="${entradas}">0</strong> · Salidas: <strong th:text="${salidas}">0</strong></p>
+    </section>
+    <section class="mb-4">
+        <h2 class="h5">Movimientos recientes</h2>
+        <p th:if="${movimientos.empty}">No hay movimientos de inventario.</p>
+        <ul th:unless="${movimientos.empty}">
+            <li th:each="m : ${movimientos}" th:text="${@fecha.local(m.fecha) + ' · ' + m.tipoMovimiento + ' · ' + m.sku + ' · ' + m.cantidad + ' · ' + m.creadoPor}"></li>
+        </ul>
+    </section>
+    <section>
+        <h2 class="h5">Actividad administrativa reciente</h2>
+        <p th:if="${auditoria.empty}">Aún no hay operaciones registradas en esta sesión de uso.</p>
+        <ul th:unless="${auditoria.empty}">
+            <li th:each="a : ${auditoria}" th:text="${@fecha.local(a.fecha) + ' · ' + a.accion + ' · ' + a.entidad + ' ' + a.idEntidad}"></li>
+        </ul>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

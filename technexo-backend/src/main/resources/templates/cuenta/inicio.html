@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Mi cuenta - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">mi cuenta</p>
+    <h1 th:text="'Hola, ' + ${nombre}">Hola</h1>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="tn-stat"><span>Reservas</span><strong th:text="${totalReservas}">0</strong></div></div>
+        <div class="col-md-4"><div class="tn-stat"><span>Pendientes</span><strong th:text="${reservasPendientes}">0</strong></div></div>
+        <div class="col-md-4"><div class="tn-stat"><span>Pedidos</span><strong th:text="${totalPedidos}">0</strong></div></div>
+    </div>
+    <p>
+        <a class="btn btn-warning btn-sm" href="/catalogo">Ir al catálogo</a>
+        <a class="btn btn-outline-light btn-sm" href="/cuenta/reservas">Mis reservas</a>
+        <a class="btn btn-outline-light btn-sm" href="/cuenta/pedidos">Mis pedidos</a>
+        <a class="btn btn-outline-light btn-sm" href="/cuenta/perfil">Perfil</a>
+    </p>
+    <div class="row g-4">
+        <section class="col-lg-6">
+            <h2 class="h5">Reservas recientes</h2>
+            <p th:if="${reservas.empty}">Todavía no tienes reservas.</p>
+            <ul th:unless="${reservas.empty}">
+                <li th:each="r : ${reservas}" th:text="${r.sku + ' × ' + r.cantidad + ' — ' + r.estado}"></li>
+            </ul>
+        </section>
+        <section class="col-lg-6">
+            <h2 class="h5">Pedidos recientes</h2>
+            <p th:if="${pedidos.empty}">Todavía no tienes pedidos.</p>
+            <ul th:unless="${pedidos.empty}">
+                <li th:each="p : ${pedidos}" th:text="'#' + ${p.id} + ' — ' + ${p.estado} + ' — ' + ${p.total} + ' ' + ${p.moneda}"></li>
+            </ul>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

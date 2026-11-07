@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Reservas admin - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <h1>Reservas</h1>
+    <p th:if="${reservas.empty}">No hay reservas.</p>
+    <div class="tn-table-wrap" th:unless="${reservas.empty}">
+        <table class="table mb-0">
+            <thead><tr><th>ID</th><th>Producto</th><th>Cantidad</th><th>Cliente</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${reservas}">
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.sku + ' — ' + r.producto}"></td>
+                <td th:text="${r.cantidad}"></td>
+                <td th:text="${r.identificadorCliente}"></td>
+                <td th:text="${r.estado}"></td>
+                <td class="text-nowrap">
+                    <form th:if="${r.estado == 'PENDIENTE'}" class="d-inline" th:action="@{'/admin/reservas/' + ${r.id} + '/confirmar'}" method="post">
+                        <button class="btn btn-success btn-sm" type="submit">Confirmar</button>
+                    </form>
+                    <form th:if="${r.estado == 'PENDIENTE'}" class="d-inline" th:action="@{'/admin/reservas/' + ${r.id} + '/cancelar'}" method="post">
+                        <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

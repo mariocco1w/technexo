@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Categorías - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">clasificación</p>
+    <h1>Categorías, marcas y características</h1>
+    <div class="row g-4">
+        <section class="col-lg-4">
+            <h2 class="h5">Categorías</h2>
+            <ul>
+                <li th:each="c : ${categorias}">
+                    <span th:text="${c.nombre + ' · ' + c.estado}"></span>
+                    <form class="d-inline" th:action="@{'/admin/categorias/' + ${c.idCategoria} + '/estado'}" method="post">
+                        <input type="hidden" name="estado" th:value="${c.estado == 'ACTIVA'} ? 'INACTIVA' : 'ACTIVA'">
+                        <button class="btn btn-link btn-sm" type="submit" th:text="${c.estado == 'ACTIVA'} ? 'Desactivar' : 'Activar'"></button>
+                    </form>
+                </li>
+            </ul>
+            <form th:action="@{/admin/categorias}" method="post">
+                <input class="form-control mb-2" name="nombre" required placeholder="Nueva categoría">
+                <input class="form-control mb-2" name="descripcion" placeholder="Descripción">
+                <button class="btn btn-warning btn-sm" type="submit">Agregar</button>
+            </form>
+        </section>
+        <section class="col-lg-4">
+            <h2 class="h5">Marcas</h2>
+            <ul><li th:each="m : ${marcas}" th:text="${m.nombre + ' · ' + m.estado}"></li></ul>
+            <form th:action="@{/admin/marcas}" method="post">
+                <input class="form-control mb-2" name="nombre" required placeholder="Nueva marca">
+                <button class="btn btn-warning btn-sm" type="submit">Agregar</button>
+            </form>
+        </section>
+        <section class="col-lg-4">
+            <h2 class="h5">Características</h2>
+            <ul><li th:each="a : ${atributos}" th:text="${a.nombre + ' · ' + a.tipoDato}"></li></ul>
+            <form th:action="@{/admin/atributos}" method="post">
+                <input class="form-control mb-2" name="nombre" required placeholder="Nombre">
+                <select class="form-select mb-2" name="tipo">
+                    <option>TEXTO</option><option>NUMERO</option><option>BOOLEANO</option><option>FECHA</option>
+                </select>
+                <input class="form-control mb-2" name="unidad" placeholder="Unidad">
+                <button class="btn btn-warning btn-sm" type="submit">Agregar</button>
+            </form>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

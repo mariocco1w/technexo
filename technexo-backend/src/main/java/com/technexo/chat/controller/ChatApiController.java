@@ -23,7 +23,12 @@ public class ChatApiController {
     }
 
     @GetMapping("/{id}")
-    public ConversacionDto historial(@PathVariable Long id) {
-        return chatService.historial(id);
+    public ConversacionDto historial(@PathVariable Long id, @RequestParam(required = false) String sesion) {
+        return chatService.historial(id, sesion);
+    }
+
+    @PostMapping("/{id}/cerrar")
+    public void cerrar(@PathVariable Long id, @RequestParam(required = false) String sesion) {
+        chatService.nuevaConversacion(id, sesion);
     }
 }

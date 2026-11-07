@@ -28,6 +28,9 @@ public class Conversacion {
     @Column(name = "identificador_sesion", length = 150)
     private String identificadorSesion;
 
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
+
     public Long getIdConversacion() {
         return idConversacion;
     }
@@ -70,5 +73,13 @@ public class Conversacion {
 
     public void setIdentificadorSesion(String identificadorSesion) {
         this.identificadorSesion = identificadorSesion;
+    }
+
+    public Integer getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
 }

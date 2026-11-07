@@ -7,65 +7,71 @@
 <main class="container mt-4">
     <div th:replace="~{fragments/layout :: alertas}"></div>
 
-    <p class="tn-kicker mb-1">04 / checkout</p>
-    <h3>Confirmación de compra</h3>
-    <p class="text-muted">Al confirmar, el pedido queda en estado PAGADO, se guarda el precio histórico
-        y se descuenta el stock físico con un movimiento de SALIDA.</p>
+    <header class="tn-page-head">
+        <p class="tn-kicker">04 / checkout</p>
+        <h1>Confirmación de compra</h1>
+        <p>Al confirmar, el pedido queda en estado PAGADO, se guarda el precio histórico
+            y se descuenta el stock físico con un movimiento de SALIDA.</p>
+    </header>
 
     <form th:action="@{/pedidos/crear}" th:object="${pedido}" method="post">
-        <div class="row">
-            <div class="col-md-6">
-                <h5>Datos del cliente</h5>
-                <div class="mb-3">
-                    <label class="form-label">Nombre completo *</label>
-                    <input type="text" class="form-control" th:field="*{nombreCliente}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Correo</label>
-                    <input type="email" class="form-control" th:field="*{correoCliente}">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Teléfono</label>
-                    <input type="text" class="form-control" th:field="*{telefonoCliente}">
-                </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <section class="tn-panel h-100">
+                    <h2>Datos del cliente</h2>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre completo *</label>
+                        <input type="text" class="form-control" th:field="*{nombreCliente}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" th:field="*{correoCliente}">
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" th:field="*{telefonoCliente}">
+                    </div>
+                </section>
             </div>
 
-            <div class="col-md-6">
-                <h5>Productos</h5>
-                <div class="row g-2 align-items-end mb-3">
-                    <div class="col-8">
-                        <label class="form-label">Producto 1</label>
-                        <select class="form-select" name="items[0].idProducto">
-                            <option th:each="p : ${productos}" th:value="${p.id}"
-                                    th:text="${p.sku + ' - ' + p.nombre + ' (' + p.stockDisponible + ' disp.)'}"></option>
-                        </select>
+            <div class="col-lg-6">
+                <section class="tn-panel h-100">
+                    <h2>Productos</h2>
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-8">
+                            <label class="form-label">Producto 1</label>
+                            <select class="form-select" name="items[0].idProducto">
+                                <option th:each="p : ${productos}" th:value="${p.id}"
+                                        th:text="${p.sku + ' - ' + p.nombre + ' (' + p.stockDisponible + ' disp.)'}"></option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" name="items[0].cantidad" value="1" min="1">
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <label class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" name="items[0].cantidad" value="1" min="1">
-                    </div>
-                </div>
 
-                <div class="row g-2 align-items-end mb-3">
-                    <div class="col-8">
-                        <label class="form-label">Producto 2 (opcional)</label>
-                        <select class="form-select" name="items[1].idProducto">
-                            <option value="">— ninguno —</option>
-                            <option th:each="p : ${productos}" th:value="${p.id}"
-                                    th:text="${p.sku + ' - ' + p.nombre}"></option>
-                        </select>
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-8">
+                            <label class="form-label">Producto 2 (opcional)</label>
+                            <select class="form-select" name="items[1].idProducto">
+                                <option value="">— ninguno —</option>
+                                <option th:each="p : ${productos}" th:value="${p.id}"
+                                        th:text="${p.sku + ' - ' + p.nombre}"></option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" name="items[1].cantidad" value="1" min="1">
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <label class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" name="items[1].cantidad" value="1" min="1">
-                    </div>
-                </div>
 
-                <small class="text-muted">El precio de cada producto se guarda como histórico al momento de la compra.</small>
+                    <small class="text-muted">El precio de cada producto se guarda como histórico al momento de la compra.</small>
+                </section>
             </div>
         </div>
 
-        <div class="mt-3">
+        <div class="tn-form-actions">
             <button type="submit" class="btn btn-success">Confirmar compra (simular pago)</button>
             <a href="/catalogo" class="btn btn-secondary">Volver al catálogo</a>
         </div>

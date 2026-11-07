@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Mis pedidos - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">mis pedidos</p>
+    <h1>Pedidos de esta cuenta</h1>
+    <p th:if="${pedidos.empty}">No tienes pedidos.</p>
+    <article class="tn-panel p-3 mb-3" th:each="p : ${pedidos}">
+        <h2 class="h5" th:text="'Pedido #' + ${p.id} + ' — ' + ${p.estado}"></h2>
+        <p th:text="${@fecha.local(p.fecha) + ' · ' + p.total + ' ' + p.moneda}"></p>
+        <ul>
+            <li th:each="item : ${p.items}" th:text="${item.sku + ' — ' + item.producto + ' × ' + item.cantidad + ' · histórico ' + item.precioUnitarioHistorico}"></li>
+        </ul>
+    </article>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

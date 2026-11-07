@@ -18,8 +18,11 @@ $regBase   = "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$instance\MSSQLServe
 $tcp       = "$regBase\SuperSocketNetLib\Tcp"
 $svc       = "MSSQL`$SQLEXPRESS"
 $dbLogin   = "technexo_app"
-$dbPass    = "TechNexo#2026"
+$dbPass    = $env:TECHNEXO_DB_PASSWORD
 $database  = "TechNexoDB"
+if ([string]::IsNullOrWhiteSpace($dbPass)) {
+    throw "Defina la variable de entorno TECHNEXO_DB_PASSWORD antes de ejecutar este script."
+}
 
 Write-Host "== 1. Configurando TCP/IP (puerto 1433) =="
 Set-ItemProperty -Path $tcp -Name "Enabled" -Value 1 -Type DWord

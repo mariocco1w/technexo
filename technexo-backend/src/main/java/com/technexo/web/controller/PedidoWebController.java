@@ -3,6 +3,7 @@ package com.technexo.web.controller;
 import com.technexo.catalogo.service.CatalogoService;
 import com.technexo.pedidos.dto.PedidoCrearDto;
 import com.technexo.pedidos.service.PedidoService;
+import com.technexo.seguridad.SesionActual;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +18,12 @@ public class PedidoWebController {
 
     @GetMapping("/checkout")
     public String checkout(Model model) {
-        model.addAttribute("pedido", new PedidoCrearDto());
+        PedidoCrearDto pedido = new PedidoCrearDto();
+        if (SesionActual.autenticado()) {
+            pedido.setNombreCliente(SesionActual.nombre());
+            pedido.setCorreoCliente(SesionActual.correo());
+        }
+        model.addAttribute("pedido", pedido);
         model.addAttribute("productos", catalogoService.listarProductos());
         return "checkout";
     }

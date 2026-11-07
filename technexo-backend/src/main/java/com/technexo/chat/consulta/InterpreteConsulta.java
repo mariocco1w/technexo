@@ -37,6 +37,11 @@ public final class InterpreteConsulta {
         TIPOS.put("camaras", "camara");
         TIPOS.put("camara", "camara");
         TIPOS.put("ont", "ont");
+        TIPOS.put("computadoras", "computadora");
+        TIPOS.put("computadora", "computadora");
+        TIPOS.put("laptops", "computadora");
+        TIPOS.put("laptop", "computadora");
+        TIPOS.put("ordenador", "computadora");
     }
 
     private InterpreteConsulta() {

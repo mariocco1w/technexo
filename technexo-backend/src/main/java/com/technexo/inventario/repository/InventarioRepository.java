@@ -15,4 +15,7 @@ public interface InventarioRepository extends JpaRepository<Inventario, Integer>
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT i FROM Inventario i WHERE i.idProducto = :idProducto")
     Optional<Inventario> findByIdProductoForUpdate(@Param("idProducto") Integer idProducto);
+
+    @Query("SELECT i FROM Inventario i JOIN FETCH i.producto WHERE i.stockActual <= i.stockMinimo ORDER BY i.stockActual")
+    java.util.List<Inventario> findConStockBajo();
 }

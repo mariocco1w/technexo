@@ -12,6 +12,9 @@ import com.technexo.pedidos.entity.Pedido;
 import com.technexo.pedidos.repository.DetallePedidoRepository;
 import com.technexo.pedidos.repository.PedidoRepository;
 import com.technexo.reservas.repository.ReservaRepository;
+import com.technexo.seguridad.AccesoDenegadoException;
+import com.technexo.seguridad.AuditoriaService;
+import com.technexo.seguridad.SesionActual;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -29,8 +32,12 @@ public class PedidoService {
     private final InventarioRepository inventarioRepository;
     private final ReservaRepository reservaRepository;
     private final InventarioService inventarioService;
+    private final AuditoriaService auditoriaService;
 
     public Pedido crearPedido(PedidoCrearDto dto) {
+        if (SesionActual.idUsuario() == null) {
+            throw new AccesoDenegadoException("Debe iniciar sesión para registrar un pedido");
+        }
         LocalDateTime ahora = FechaUtil.ahoraUtc();
         List<DetalleTemp> detalles = new ArrayList<>();
         BigDecimal subtotal = BigDecimal.ZERO;
@@ -39,6 +46,9 @@ public class PedidoService {
                 continue;
             }
             Producto p = productoRepository.findById(item.getIdProducto()).orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + item.getIdProducto()));
+            if (!"ACTIVO".equals(p.getEstado())) {
+                throw new IllegalStateException("El producto no está activo: " + p.getSku());
+            }
             int stockActual = inventarioRepository.findById(item.getIdProducto()).map(i -> i.getStockActual()).orElse(0);
             int reservadas = reservaRepository.sumReservasPendientesVigentes(item.getIdProducto(), ahora);
             int disponible = stockActual - reservadas;
@@ -51,19 +61,64 @@ public class PedidoService {
         if (detalles.isEmpty()) {
             throw new IllegalArgumentException("El pedido debe contener al menos un producto válido");
         }
-        Pedido pedido = Pedido.builder().fecha(ahora).estado("PAGADO").subtotal(subtotal).total(subtotal).moneda("GTQ").nombreCliente(dto.getNombreCliente()).correoCliente(dto.getCorreoCliente()).telefonoCliente(dto.getTelefonoCliente()).claveIdempotencia(UUID.randomUUID()).build();
+        Pedido pedido = Pedido.builder().fecha(ahora).estado("PAGADO").subtotal(subtotal).total(subtotal).moneda("GTQ").nombreCliente(SesionActual.nombre()).correoCliente(SesionActual.correo()).telefonoCliente(dto.getTelefonoCliente()).claveIdempotencia(UUID.randomUUID()).build();
+        pedido.setIdUsuario(SesionActual.idUsuario());
         pedido = pedidoRepository.save(pedido);
         for (DetalleTemp t : detalles) {
             DetallePedido d = DetallePedido.builder().pedido(pedido).producto(t.producto()).cantidad(t.cantidad()).precioUnitarioHistorico(t.precioHistorico()).build();
             detalleRepository.save(d);
-            inventarioService.registrarSalida(t.producto(), t.cantidad(), "Confirmación de pedido/pago", "PED-" + pedido.getIdPedido(), "WEB");
+            inventarioService.registrarSalida(t.producto(), t.cantidad(), "Confirmación de pedido/pago", "PED-" + pedido.getIdPedido(), SesionActual.correo());
         }
+        auditoriaService.registrar("CREAR_PEDIDO", "Pedido", String.valueOf(pedido.getIdPedido()), pedido.getCorreoCliente());
         return pedido;
+    }
+
+    public Pedido actualizarEstado(Long idPedido, String nuevoEstado) {
+        if (!SesionActual.esAdmin()) {
+            throw new AccesoDenegadoException("Solo un administrador puede cambiar el estado de un pedido");
+        }
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+        String actual = pedido.getEstado();
+        boolean permitido = ("PAGADO".equals(actual) && "CANCELADO".equals(nuevoEstado))
+                || ("PENDIENTE".equals(actual) && ("CONFIRMADO".equals(nuevoEstado) || "CANCELADO".equals(nuevoEstado) || "RECHAZADO".equals(nuevoEstado)))
+                || ("CONFIRMADO".equals(actual) && "PAGADO".equals(nuevoEstado));
+        if (!permitido) {
+            throw new IllegalStateException("Transición no permitida: " + actual + " → " + nuevoEstado);
+        }
+        if ("PAGADO".equals(actual) && "CANCELADO".equals(nuevoEstado)) {
+            for (DetallePedido detalle : detalleRepository.findByPedido_IdPedido(idPedido)) {
+                inventarioService.registrarEntrada(detalle.getProducto(), detalle.getCantidad(),
+                        "Devolución por cancelación de pedido", "PED-" + idPedido, SesionActual.correo());
+            }
+        }
+        pedido.setEstado(nuevoEstado);
+        Pedido guardado = pedidoRepository.save(pedido);
+        auditoriaService.registrar("CAMBIAR_ESTADO_PEDIDO", "Pedido", String.valueOf(idPedido), actual + " → " + nuevoEstado);
+        return guardado;
     }
 
     @Transactional(readOnly = true)
     public List<PedidoDto> listar() {
-        return pedidoRepository.findAll().stream().sorted((a, b) -> b.getIdPedido().compareTo(a.getIdPedido())).map(this::aDto).toList();
+        if (SesionActual.esAdmin()) {
+            return pedidoRepository.findAll().stream().sorted((a, b) -> b.getIdPedido().compareTo(a.getIdPedido())).map(this::aDto).toList();
+        }
+        return listarPropios();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PedidoDto> listarPropios() {
+        Integer idUsuario = SesionActual.idUsuario();
+        if (idUsuario == null) {
+            throw new AccesoDenegadoException("Debe iniciar sesión");
+        }
+        return pedidoRepository.findByIdUsuarioOrderByIdPedidoDesc(idUsuario).stream().map(this::aDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PedidoDto obtenerPropio(Long idPedido) {
+        PedidoDto pedido = listarPropios().stream().filter(p -> p.id().equals(idPedido)).findFirst()
+                .orElseThrow(() -> new AccesoDenegadoException("No puede consultar pedidos de otra cuenta"));
+        return pedido;
     }
 
     private PedidoDto aDto(Pedido p) {
@@ -74,12 +129,13 @@ public class PedidoService {
     private record DetalleTemp(Producto producto, Integer cantidad, BigDecimal precioHistorico) {
     }
 
-    public PedidoService(final PedidoRepository pedidoRepository, final DetallePedidoRepository detalleRepository, final ProductoRepository productoRepository, final InventarioRepository inventarioRepository, final ReservaRepository reservaRepository, final InventarioService inventarioService) {
+    public PedidoService(final PedidoRepository pedidoRepository, final DetallePedidoRepository detalleRepository, final ProductoRepository productoRepository, final InventarioRepository inventarioRepository, final ReservaRepository reservaRepository, final InventarioService inventarioService, final AuditoriaService auditoriaService) {
         this.pedidoRepository = pedidoRepository;
         this.detalleRepository = detalleRepository;
         this.productoRepository = productoRepository;
         this.inventarioRepository = inventarioRepository;
         this.reservaRepository = reservaRepository;
         this.inventarioService = inventarioService;
+        this.auditoriaService = auditoriaService;
     }
 }

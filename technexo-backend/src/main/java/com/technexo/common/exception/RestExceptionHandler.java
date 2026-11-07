@@ -1,5 +1,8 @@
 package com.technexo.common.exception;
 
+import com.technexo.seguridad.AccesoDenegadoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +25,13 @@ import java.util.Map;
 })
 public class RestExceptionHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<Map<String, Object>> acceso(AccesoDenegadoException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(cuerpo(ex.getMessage()));
+    }
+
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
     public ResponseEntity<Map<String, Object>> reglaNegocio(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(cuerpo(ex.getMessage()));
@@ -38,7 +48,8 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> general(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(cuerpo(ex.getMessage()));
+        LOG.error("Error en la API", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(cuerpo("No se pudo completar la operación"));
     }
 
     private Map<String, Object> cuerpo(String mensaje) {

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Perfil - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4" style="max-width: 40rem;">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">perfil</p>
+    <h1>Datos de la cuenta</h1>
+    <p>Correo: <strong th:text="${correo}"></strong></p>
+    <form th:action="@{/cuenta/perfil}" method="post" class="mb-4">
+        <label class="form-label">Nombre</label>
+        <input class="form-control mb-2" name="nombre" required maxlength="150" th:value="${nombre}">
+        <button class="btn btn-warning" type="submit">Guardar nombre</button>
+    </form>
+    <h2 class="h5">Cambiar contraseña</h2>
+    <form th:action="@{/cuenta/password}" method="post">
+        <input class="form-control mb-2" type="password" name="actual" required placeholder="Contraseña actual" autocomplete="current-password">
+        <input class="form-control mb-2" type="password" name="nueva" required minlength="10" placeholder="Nueva contraseña" autocomplete="new-password">
+        <button class="btn btn-outline-warning" type="submit">Actualizar contraseña</button>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

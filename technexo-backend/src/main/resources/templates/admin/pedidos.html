@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Pedidos admin - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <h1>Pedidos</h1>
+    <p>Cancelar un pedido PAGADO devuelve las unidades al inventario.</p>
+    <article class="tn-panel p-3 mb-3" th:each="p : ${pedidos}">
+        <h2 class="h5" th:text="'#' + ${p.id} + ' — ' + ${p.estado} + ' — ' + ${p.total} + ' ' + ${p.moneda}"></h2>
+        <p th:text="${p.nombreCliente + ' · ' + @fecha.local(p.fecha)}"></p>
+        <ul><li th:each="item : ${p.items}" th:text="${item.sku + ' × ' + item.cantidad + ' · ' + item.precioUnitarioHistorico}"></li></ul>
+        <form th:if="${p.estado == 'PAGADO'}" th:action="@{'/admin/pedidos/' + ${p.id} + '/estado'}" method="post">
+            <input type="hidden" name="estado" value="CANCELADO">
+            <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar y devolver stock</button>
+        </form>
+        <form th:if="${p.estado == 'PENDIENTE'}" th:action="@{'/admin/pedidos/' + ${p.id} + '/estado'}" method="post" class="d-flex gap-2">
+            <select class="form-select form-select-sm" name="estado" style="max-width: 12rem;">
+                <option>CONFIRMADO</option><option>CANCELADO</option><option>RECHAZADO</option>
+            </select>
+            <button class="btn btn-warning btn-sm" type="submit">Actualizar</button>
+        </form>
+    </article>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

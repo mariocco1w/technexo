@@ -30,6 +30,8 @@ public class Pedido {
     private String telefonoCliente;
     @Column(name = "clave_idempotencia", nullable = false, unique = true)
     private UUID claveIdempotencia;
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
 
     public static class PedidoBuilder {
         private Long idPedido;
@@ -218,6 +220,14 @@ public class Pedido {
 
     public void setClaveIdempotencia(final UUID claveIdempotencia) {
         this.claveIdempotencia = claveIdempotencia;
+    }
+
+    public Integer getIdUsuario() {
+        return this.idUsuario;
+    }
+
+    public void setIdUsuario(final Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public Pedido() {

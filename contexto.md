@@ -281,7 +281,15 @@ Si el proyecto está en un repositorio Git, revisar la rama actual, los cambios 
 
 Si falta alguno de estos archivos, registrar su ausencia. No inventar su contenido ni recrear el proyecto entero automáticamente.
 
-## 8. Trabajo pendiente
+## 8. Estado real a noviembre de 2026
+
+La construcción prevista en las fases siguientes ya está en el código. El detalle de lo comprobado, lo parcial y lo que no debe declararse terminado está en `docs/auditoria.md`, `docs/chatbot.md`, `docs/seguridad.md` y `docs/pruebas-smoke.md`.
+
+Queda fuera, a propósito:
+
+- Un modelo de lenguaje externo. El asistente interpreta la frase en el servidor y consulta servicios del backend. No hay clave de API que inventar.
+- Recuperación de contraseña por correo. No hay servidor de correo configurado.
+- Rotación de la contraseña de SQL Server que llegó a estar en el repositorio. Hay que hacerla en el servidor; el archivo local no se versiona.
 
 ### Fase 1. Auditoría del estado actual
 

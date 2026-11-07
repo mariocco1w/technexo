@@ -37,17 +37,31 @@ public class CatalogoService {
 
     public List<ProductoDto> buscar(String q) {
         Map<Integer, DisponibilidadProducto> disp = mapaDisponibilidad();
-        return productoRepository.buscarPorTexto(q).stream().map(p -> aDto(p, disp.get(p.getIdProducto()))).toList();
+        return productoRepository.buscarPorTexto(q).stream()
+                .filter(p -> "ACTIVO".equals(p.getEstado()))
+                .map(p -> aDto(p, disp.get(p.getIdProducto()))).toList();
     }
 
     public ProductoDto obtenerProducto(Integer idProducto) {
         Producto p = productoRepository.findById(idProducto).orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + idProducto));
+        if (!"ACTIVO".equals(p.getEstado())) {
+            throw new IllegalArgumentException("Producto no encontrado: " + idProducto);
+        }
         DisponibilidadProducto d = disponibilidadRepository.findById(idProducto).orElse(null);
         return aDto(p, d);
     }
 
     public List<AtributoDto> listarAtributos(Integer idProducto) {
         return productoAtributoRepository.findByProductoIdConAtributo(idProducto).stream().map(this::aAtributoDto).toList();
+    }
+
+    public List<ProductoDto> listarPorCategoria(String categoria) {
+        if (categoria == null || categoria.isBlank()) {
+            return listarProductos();
+        }
+        return listarProductos().stream()
+                .filter(p -> categoria.equalsIgnoreCase(p.categoria()))
+                .toList();
     }
 
     public List<CategoriaDto> listarCategorias() {

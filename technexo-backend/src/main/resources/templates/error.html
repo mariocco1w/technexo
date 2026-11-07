@@ -4,9 +4,11 @@
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <main class="container mt-5">
-    <p class="tn-kicker mb-2">ERR / operación</p>
+    <header class="tn-page-head">
+        <p class="tn-kicker">ERR / operación</p>
+        <h1>No se pudo completar</h1>
+    </header>
     <div class="alert alert-danger">
-        <h4>No se pudo completar</h4>
         <p class="mb-0" th:text="${error}">Ha ocurrido un error</p>
     </div>
     <a href="/" class="btn btn-primary">Volver al inicio</a>

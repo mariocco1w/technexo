@@ -26,6 +26,8 @@ public class Reserva {
     private String identificadorCliente;
     @Column(name = "id_conversacion")
     private Long idConversacion;
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
 
     public static class ReservaBuilder {
         private Long idReserva;
@@ -180,6 +182,14 @@ public class Reserva {
 
     public void setIdConversacion(final Long idConversacion) {
         this.idConversacion = idConversacion;
+    }
+
+    public Integer getIdUsuario() {
+        return this.idUsuario;
+    }
+
+    public void setIdUsuario(final Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public Reserva() {

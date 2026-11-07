@@ -1,10 +1,12 @@
 spring:
   application:
     name: technexo-backend
+  config:
+    import: optional:file:./config/application-local.yml
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=TechNexoDB;encrypt=false;trustServerCertificate=true;loginTimeout=30
-    username: technexo_app
-    password: "TechNexo#2026"
+    url: ${TECHNEXO_DB_URL:jdbc:sqlserver://localhost:1433;databaseName=TechNexoDB;encrypt=false;trustServerCertificate=true;loginTimeout=30}
+    username: ${TECHNEXO_DB_USERNAME:technexo_app}
+    password: ${TECHNEXO_DB_PASSWORD}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     hibernate:
@@ -20,7 +22,17 @@ spring:
     cache: false
 server:
   port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+      timeout: 30m
 logging:
   level:
     org.hibernate.SQL: INFO
-    com.technexo: DEBUG
+    com.technexo: INFO

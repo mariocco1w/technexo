@@ -17,13 +17,16 @@ public class HomeController {
     }
 
     @GetMapping("/catalogo")
-    public String catalogo(Model model) {
-        model.addAttribute("productos", catalogoService.listarProductos());
+    public String catalogo(@RequestParam(value = "categoria", required = false) String categoria, Model model) {
+        model.addAttribute("categorias", catalogoService.listarCategorias());
+        model.addAttribute("categoria", categoria);
+        model.addAttribute("productos", catalogoService.listarPorCategoria(categoria));
         return "catalogo";
     }
 
     @GetMapping("/buscar")
     public String buscar(@RequestParam(value = "q", required = false) String q, Model model) {
+        model.addAttribute("categorias", catalogoService.listarCategorias());
         if (q == null || q.isBlank()) {
             model.addAttribute("productos", catalogoService.listarProductos());
         } else {

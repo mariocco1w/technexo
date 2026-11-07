@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Productos - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">catálogo</p>
+    <h1>Productos</h1>
+    <p><a class="btn btn-warning btn-sm" href="/admin/productos/nuevo">Registrar producto</a> <a href="/admin">Volver</a></p>
+    <div class="tn-table-wrap">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>SKU</th><th>Nombre</th><th>Marca</th><th>Categoría</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="p : ${productos}">
+                <td th:text="${p.sku}"></td>
+                <td th:text="${p.nombre}"></td>
+                <td th:text="${p.marca.nombre}"></td>
+                <td th:text="${p.categoria.nombre}"></td>
+                <td th:text="${p.precio + ' ' + p.moneda}"></td>
+                <td th:text="${p.estado}"></td>
+                <td class="text-nowrap">
+                    <a th:href="@{'/admin/productos/' + ${p.idProducto}}">Editar</a>
+                    <form th:if="${p.estado == 'ACTIVO'}" class="d-inline" th:action="@{'/admin/productos/' + ${p.idProducto} + '/estado'}" method="post">
+                        <input type="hidden" name="estado" value="INACTIVO">
+                        <button class="btn btn-link btn-sm" type="submit">Desactivar</button>
+                    </form>
+                    <form th:if="${p.estado != 'ACTIVO'}" class="d-inline" th:action="@{'/admin/productos/' + ${p.idProducto} + '/estado'}" method="post">
+                        <input type="hidden" name="estado" value="ACTIVO">
+                        <button class="btn btn-link btn-sm" type="submit">Activar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

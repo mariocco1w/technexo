@@ -4,7 +4,7 @@ Aplicación web desarrollada con **Spring Boot 3.3.6 + Java 17 + Thymeleaf** que
 implementa el catálogo, las reservas, los pedidos y el inventario de TechNexo,
 trabajando **sobre el esquema existente `TechNexoDB`** sin alterar su diseño.
 
-> El **chatbot está fuera de alcance por ahora** (fases posteriores).
+Incluye catálogo, reservas, pedidos, inventario, cuentas con roles, panel de administración, panel del cliente y un asistente que solo responde con datos de la base.
 
 ---
 
@@ -53,12 +53,16 @@ servicio). Es un cambio de configuración, **no destructivo**.
 
 ## 3. Credenciales y conexión
 
+La contraseña de SQL Server no va en el repositorio. Cópiela en `technexo-backend/config/application-local.yml` (está en `.gitignore`) o expórtela como `TECHNEXO_DB_PASSWORD` antes de arrancar. El ejemplo de variables está en `.env.example`.
+
 | Parámetro | Valor |
 |---|---|
 | Usuario SQL | `technexo_app` |
-| Contraseña | `TechNexo#2026` |
+| Contraseña | variable `TECHNEXO_DB_PASSWORD` |
 | Servidor | `localhost,1433` |
 | Base de datos | `TechNexoDB` |
+
+Esa contraseña quedó antes en este archivo y en el historial de Git. Hay que rotarla en SQL Server; el valor antiguo debe considerarse comprometido.
 
 Cadena usada por el backend (`src/main/resources/application.yml`):
 
@@ -104,7 +108,10 @@ mvnw.cmd spring-boot:run
 | `/reservas` | Listado de reservas; confirmar / cancelar |
 | `/checkout` | Alta de pedido (datos del cliente + productos) |
 | `/pedidos` | Pedidos registrados con su detalle e importe |
-| `/inventario` | Existencias, registro de ingreso (ENTRADA) y movimientos |
+| `/inventario` | Existencias e ingresos. Solo administrador |
+| `/login`, `/registro` | Acceso y alta de cliente |
+| `/cuenta` | Panel del cliente: perfil, reservas y pedidos propios |
+| `/admin` | Panel de administración. Solo rol `ADMIN` |
 
 ---
 
@@ -124,7 +131,8 @@ mvnw.cmd spring-boot:run
 | POST | `/api/pedidos` | Crea un pedido (PAGADO) |
 | GET | `/api/inventario` | Existencias |
 | GET | `/api/inventario/movimientos` | Movimientos de inventario |
-| POST | `/api/inventario/entrada` | Registra un ingreso (ENTRADA) |
+| POST | `/api/inventario/entrada` | Registra un ingreso (ENTRADA). Solo administrador |
+| POST | `/api/chat` | Pregunta al asistente. Exige token CSRF |
 
 Los errores de negocio se devuelven como JSON con código `409 Conflict` y la
 clave `error`; las validaciones como `400 Bad Request`. Las vistas, en cambio,
@@ -173,9 +181,8 @@ su estado original (stock 8, sin reservas/pedidos/movimientos).
 
 ---
 
-## 9. Pendientes (fases posteriores)
+## 9. Estado y documentación
 
-- Prueba de **concurrencia real** con dos sesiones simultáneas.
-- **Idempotencia** de pedidos extremo a extremo (reintentos).
-- **Chatbot** (conversación/mensajes) — explícitamente fuera de alcance por ahora.
-- Ampliaciones de frontend (carrito persistente, autenticación, panel admin).
+Lo operativo está descrito en `docs/`: auditoría, arquitectura, chatbot, paneles, seguridad, pruebas smoke y correcciones.
+
+Sigue pendiente: rotar la contraseña de SQL que estuvo en el historial, recuperación de contraseña por correo (no hay servidor de correo), prueba de concurrencia con dos sesiones y un modelo de lenguaje externo. El asistente actual interpreta la frase en el servidor y consulta la base; no llama a un proveedor de IA.

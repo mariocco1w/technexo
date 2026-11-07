@@ -20,7 +20,10 @@ Write-Host "Esperando a que SQL Server acepte conexiones ..."
 Start-Sleep -Seconds 8
 
 try {
-    sqlcmd -S "localhost,1433" -U technexo_app -P "TechNexo#2026" -d TechNexoDB -Q "SELECT 1 AS ok" -W | Out-Null
+    if ([string]::IsNullOrWhiteSpace($env:TECHNEXO_DB_PASSWORD)) {
+        throw "Defina TECHNEXO_DB_PASSWORD para verificar el login."
+    }
+    sqlcmd -S "localhost,1433" -U technexo_app -P $env:TECHNEXO_DB_PASSWORD -d TechNexoDB -Q "SELECT 1 AS ok" -W | Out-Null
     Write-Host "RESULTADO: TCP/IP habilitado y conexion verificada en localhost,1433"
 } catch {
     Write-Host "RESULTADO: TCP habilitado, pero la prueba de conexion fallo. Verifique el firewall."

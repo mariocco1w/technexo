@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Usuarios - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <h1>Usuarios</h1>
+    <p>Un administrador no puede cambiar su propio rol ni desactivar su propia cuenta.</p>
+    <div class="tn-table-wrap">
+        <table class="table mb-0">
+            <thead><tr><th>Nombre</th><th>Correo</th><th>Roles</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td th:text="${u.nombre}"></td>
+                <td th:text="${u.correo}"></td>
+                <td><span th:each="rol : ${u.roles}" th:text="${rol.nombre + ' '}"></span></td>
+                <td th:text="${u.activo} ? 'Activa' : 'Inactiva'"></td>
+                <td th:unless="${u.idUsuario == yo}">
+                    <form class="d-inline" th:action="@{'/admin/usuarios/' + ${u.idUsuario} + '/rol'}" method="post">
+                        <input type="hidden" name="rol" th:value="${u.tieneRol('ADMIN')} ? 'CLIENTE' : 'ADMIN'">
+                        <button class="btn btn-link btn-sm" type="submit" th:text="${u.tieneRol('ADMIN')} ? 'Pasar a cliente' : 'Pasar a admin'"></button>
+                    </form>
+                    <form class="d-inline" th:action="@{'/admin/usuarios/' + ${u.idUsuario} + '/activo'}" method="post">
+                        <input type="hidden" name="activo" th:value="${!u.activo}">
+                        <button class="btn btn-link btn-sm" type="submit" th:text="${u.activo} ? 'Desactivar' : 'Activar'"></button>
+                    </form>
+                </td>
+                <td th:if="${u.idUsuario == yo}">Tu cuenta</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>

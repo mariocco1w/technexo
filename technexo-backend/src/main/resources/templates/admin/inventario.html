@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Inventario - TechNexo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container mt-4">
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+    <p class="tn-kicker">inventario</p>
+    <h1>Existencias y movimientos</h1>
+    <p th:if="${!bajos.empty}">Productos en o bajo el mínimo: <span th:each="b : ${bajos}" th:text="${b.sku + ' (' + b.stockActual + ') '}"></span></p>
+    <div class="row g-4 mb-4">
+        <form class="col-md-6 tn-panel p-3" th:action="@{/admin/inventario/entrada}" method="post">
+            <h2 class="h5">Entrada</h2>
+            <select class="form-select mb-2" name="idProducto" required>
+                <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.sku + ' — ' + p.nombre}"></option>
+            </select>
+            <input class="form-control mb-2" type="number" min="1" name="cantidad" required placeholder="Cantidad">
+            <input class="form-control mb-2" name="motivo" placeholder="Motivo">
+            <button class="btn btn-warning btn-sm" type="submit">Registrar entrada</button>
+        </form>
+        <form class="col-md-6 tn-panel p-3" th:action="@{/admin/inventario/salida}" method="post">
+            <h2 class="h5">Salida autorizada</h2>
+            <select class="form-select mb-2" name="idProducto" required>
+                <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.sku + ' — ' + p.nombre}"></option>
+            </select>
+            <input class="form-control mb-2" type="number" min="1" name="cantidad" required placeholder="Cantidad">
+            <input class="form-control mb-2" name="motivo" required placeholder="Motivo de la salida">
+            <button class="btn btn-outline-warning btn-sm" type="submit">Registrar salida</button>
+        </form>
+    </div>
+    <h2 class="h5">Existencias</h2>
+    <div class="tn-table-wrap mb-4">
+        <table class="table mb-0">
+            <thead><tr><th>SKU</th><th>Producto</th><th>Físico</th><th>Mínimo</th><th>Ubicación</th></tr></thead>
+            <tbody>
+            <tr th:each="i : ${inventario}">
+                <td th:text="${i.sku}"></td><td th:text="${i.nombre}"></td>
+                <td th:text="${i.stockActual}"></td><td th:text="${i.stockMinimo}"></td><td th:text="${i.ubicacion}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2 class="h5">Historial</h2>
+    <ul>
+        <li th:each="m : ${movimientos}" th:text="${@fecha.local(m.fecha) + ' · ' + m.tipoMovimiento + ' · ' + m.sku + ' · ' + m.cantidad + ' · ' + m.motivo + ' · ' + m.creadoPor}"></li>
+    </ul>
+</main>
+<footer th:replace="~{fragments/layout :: cierre}"></footer>
+</body>
+</html>
