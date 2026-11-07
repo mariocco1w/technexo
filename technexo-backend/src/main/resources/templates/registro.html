@@ -3,26 +3,42 @@
 <head th:replace="~{fragments/layout :: head(titulo='Registro - TechNexo')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
-<main class="container mt-4" style="max-width: 32rem;">
-    <div th:replace="~{fragments/layout :: alertas}"></div>
-    <p class="tn-kicker">cuenta nueva</p>
-    <h1>Crear cuenta de cliente</h1>
-    <form th:action="@{/registro}" method="post" class="tn-panel p-3">
-        <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <input class="form-control" name="nombre" required maxlength="150" th:value="${nombre}">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Correo</label>
-            <input class="form-control" name="correo" type="email" required maxlength="254" th:value="${correo}">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Contraseña</label>
-            <input class="form-control" name="password" type="password" required minlength="10" autocomplete="new-password">
-            <small class="text-muted">Mínimo 10 caracteres, con letras y números.</small>
-        </div>
-        <button class="btn btn-warning" type="submit">Registrarme</button>
-    </form>
+<main class="container tn-auth">
+    <section class="tn-auth-card">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <p class="tn-kicker">cuenta nueva</p>
+        <h1>Crear cuenta</h1>
+        <p class="tn-auth-lead">El registro abre una cuenta de cliente.</p>
+        <form th:action="@{/registro}" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="nombre">Nombre</label>
+                <input class="form-control" id="nombre" name="nombre" required maxlength="150" th:value="${nombre}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="correo">Correo</label>
+                <div class="tn-input">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
+                        <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                    </svg>
+                    <input class="form-control" id="correo" name="correo" type="email" required maxlength="254" th:value="${correo}" autocomplete="email">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="password">Contraseña</label>
+                <div class="tn-input">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
+                        <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                    </svg>
+                    <input class="form-control" id="password" name="password" type="password" required minlength="10" autocomplete="new-password">
+                </div>
+                <small class="text-muted">Mínimo 10 caracteres, con letras y números.</small>
+            </div>
+            <button class="btn btn-primary" type="submit">Crear cuenta</button>
+        </form>
+        <p class="tn-auth-alt">¿Ya tienes acceso? <a href="/login">Entrar</a></p>
+    </section>
 </main>
 <footer th:replace="~{fragments/layout :: cierre}"></footer>
 </body>

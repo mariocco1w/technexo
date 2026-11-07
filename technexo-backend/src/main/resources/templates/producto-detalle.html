@@ -7,79 +7,99 @@
 <main class="container mt-4">
     <div th:replace="~{fragments/layout :: alertas}"></div>
 
-    <a class="tn-back" href="/catalogo">Volver al catálogo</a>
+    <nav class="tn-crumbs" aria-label="Migas de pan">
+        <a href="/">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <a href="/catalogo">Catálogo</a>
+        <span aria-hidden="true">/</span>
+        <a th:href="@{/catalogo(categoria=${producto.categoria})}" th:text="${producto.categoria}">Categoría</a>
+    </nav>
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <p class="tn-kicker">03 / ficha técnica</p>
-            <h1 th:text="${producto.nombre}">Producto</h1>
-            <p class="tn-sku">SKU: <span th:text="${producto.sku}"></span></p>
-            <p th:text="${producto.descripcion}"></p>
+    <div class="tn-ficha">
+        <section class="tn-ficha-gallery" aria-label="Vista del equipo">
+            <div class="tn-stage">
+                <svg th:replace="~{fragments/hardware :: equipo}"></svg>
+                <ul class="tn-float-badges" th:if="${producto.descripcion != null}">
+                    <li th:each="parte, st : ${#strings.arraySplit(producto.descripcion, ',')}"
+                        th:if="${st.index < 3 and !#strings.isEmpty(#strings.trim(parte))}"
+                        th:text="${#strings.abbreviate(#strings.trim(parte), 28)}">Spec</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <div class="tn-title-row">
+                <h1 th:text="${producto.nombre}">Producto</h1>
+                <button type="button" class="tn-sku-copy" th:data-sku="${producto.sku}" aria-label="Copiar SKU">
+                    <span class="tn-sku" th:text="${producto.sku}">SKU</span>
+                    <span class="tn-sku-copy-label">Copiar</span>
+                </button>
+            </div>
+            <p class="tn-lead-copy" th:text="${producto.descripcion}">Descripción</p>
+            <p class="tn-brand">Marca: <span th:text="${producto.marca}">Marca</span></p>
 
             <section class="tn-panel tn-specs">
                 <h2>Ficha técnica</h2>
-                <div class="tn-table-wrap">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                        <tr><th>Atributo</th><th>Valor</th><th>Unidad</th></tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="a : ${atributos}">
-                            <td th:text="${a.nombre}"></td>
-                            <td th:text="${a.valor}"></td>
-                            <td th:text="${a.unidad}"></td>
-                        </tr>
-                        <tr th:if="${atributos.empty}">
-                            <td colspan="3">Sin atributos registrados.</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="tn-kv">
+                    <tbody>
+                    <tr th:each="a : ${atributos}">
+                        <th scope="row" th:text="${a.nombre}">Atributo</th>
+                        <td>
+                            <span th:text="${a.valor}">Valor</span>
+                            <span class="tn-unit" th:if="${a.unidad != null and !#strings.isEmpty(a.unidad)}" th:text="${a.unidad}"></span>
+                        </td>
+                    </tr>
+                    <tr th:if="${atributos.empty}">
+                        <td colspan="2">Sin atributos registrados.</td>
+                    </tr>
+                    </tbody>
+                </table>
             </section>
-        </div>
+        </section>
 
-        <div class="col-lg-4">
-            <aside class="card tn-buy">
-                <div class="card-body">
-                    <p class="tn-price" th:text="${producto.precio + ' ' + producto.moneda}">0.00 GTQ</p>
-                    <p class="tn-meta-line">Marca: <strong th:text="${producto.marca}"></strong></p>
-                    <p class="tn-meta-line">Categoría: <strong th:text="${producto.categoria}"></strong></p>
-                    <p class="tn-meta-line mb-0">Estado: <span class="badge bg-success" th:text="${producto.estado}"></span></p>
-                    <dl class="tn-stock">
-                        <div>
-                            <dt>Stock físico</dt>
-                            <dd th:text="${producto.stockFisico}">0</dd>
-                        </div>
-                        <div>
-                            <dt>Reservadas</dt>
-                            <dd th:text="${producto.cantidadReservada}">0</dd>
-                        </div>
-                        <div>
-                            <dt>Disponible</dt>
-                            <dd th:text="${producto.stockDisponible}">0</dd>
-                        </div>
-                    </dl>
-
-                    <div th:if="${producto.stockDisponible <= 0}" class="alert alert-warning py-2">
-                        Sin disponibilidad por el momento.
-                    </div>
-
-                    <form th:if="${producto.stockDisponible > 0}" th:action="@{/reservas/crear}" method="post" sec:authorize="isAuthenticated()">
-                        <input type="hidden" name="idProducto" th:value="${producto.id}">
-                        <div class="mb-2">
-                            <label class="form-label">Cantidad</label>
-                            <input type="number" class="form-control" name="cantidad" value="1" min="1"
-                                   th:max="${producto.stockDisponible}">
-                        </div>
-                        <button type="submit" class="btn btn-warning w-100">Reservar</button>
-                        <small class="text-muted d-block mt-1">La reserva queda a tu nombre y expira en 30 minutos.</small>
-                    </form>
-                    <a th:if="${producto.stockDisponible > 0}" sec:authorize="!isAuthenticated()" class="btn btn-outline-warning w-100" href="/login">Entra para reservar</a>
-
-                    <a th:href="@{/checkout}" class="btn btn-success w-100 mt-2">Comprar ahora</a>
+        <aside class="card tn-buy tn-buy-panel">
+            <p class="tn-price">
+                <span class="tn-price-num" th:text="${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                <span class="tn-price-cur" th:text="${producto.moneda}">GTQ</span>
+            </p>
+            <span class="tn-pill" th:classappend="${producto.stockDisponible > 0} ? 'is-live' : 'is-off'">
+                <span class="tn-pulse" th:if="${producto.stockDisponible > 0}" aria-hidden="true"></span>
+                <span th:text="${producto.stockDisponible > 0} ? (${producto.stockDisponible} + ' disponibles') : 'Sin stock'">Disponible</span>
+            </span>
+            <dl class="tn-stock">
+                <div>
+                    <dt>Stock físico</dt>
+                    <dd th:text="${producto.stockFisico}">0</dd>
                 </div>
-            </aside>
-        </div>
+                <div>
+                    <dt>Reservadas</dt>
+                    <dd th:text="${producto.cantidadReservada}">0</dd>
+                </div>
+            </dl>
+            <p class="tn-meta-line mb-0">Estado: <span class="tn-pill is-live" th:if="${producto.estado == 'ACTIVO'}" th:text="${producto.estado}">ACTIVO</span>
+                <span class="tn-pill is-off" th:unless="${producto.estado == 'ACTIVO'}" th:text="${producto.estado}">Estado</span>
+            </p>
+
+            <div th:if="${producto.stockDisponible <= 0}" class="alert alert-warning py-2 mt-3 mb-0">
+                Sin disponibilidad por el momento.
+            </div>
+
+            <form th:if="${producto.stockDisponible > 0}" th:action="@{/reservas/crear}" method="post" sec:authorize="isAuthenticated()">
+                <input type="hidden" name="idProducto" th:value="${producto.id}">
+                <p class="tn-timer">Tu reserva se mantendrá vigente por <strong>30 minutos</strong>.</p>
+                <div class="tn-stepper" th:attr="data-max=${producto.stockDisponible}">
+                    <button type="button" data-step="-1" aria-label="Reducir cantidad">−</button>
+                    <input class="form-control" type="number" name="cantidad" value="1" min="1" th:max="${producto.stockDisponible}" aria-label="Cantidad">
+                    <button type="button" data-step="1" aria-label="Aumentar cantidad">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3">Reservar ahora</button>
+            </form>
+            <div th:if="${producto.stockDisponible > 0}" sec:authorize="!isAuthenticated()">
+                <p class="tn-timer">Tu reserva se mantendrá vigente por <strong>30 minutos</strong>.</p>
+                <a class="btn btn-primary w-100" href="/login">Entrar para reservar</a>
+            </div>
+            <a th:if="${producto.stockDisponible > 0}" class="btn btn-secondary w-100 mt-2" th:href="@{/checkout}">Comprar ahora</a>
+        </aside>
     </div>
 </main>
 

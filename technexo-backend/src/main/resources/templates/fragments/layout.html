@@ -6,31 +6,36 @@
     <title th:text="${titulo}">TechNexo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/technexo.css(v=6)}" rel="stylesheet">
+    <link th:href="@{/css/technexo.css(v=9)}" rel="stylesheet">
 </head>
 <body>
 
 <nav th:fragment="nav" class="navbar navbar-expand-lg navbar-dark tn-nav">
     <div class="container">
         <a class="navbar-brand" href="/">TechNexo</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Abrir menú">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav tn-nav-links">
                 <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="/catalogo">Catálogo</a></li>
                 <li class="nav-item" sec:authorize="isAuthenticated()"><a class="nav-link" href="/cuenta">Mi cuenta</a></li>
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/admin">Administración</a></li>
                 <li class="nav-item"><a class="nav-link" href="/checkout">Checkout</a></li>
             </ul>
-            <form class="d-flex tn-search" action="/buscar" method="get" role="search">
-                <input class="form-control" type="search" name="q" placeholder="SKU, marca o nombre" aria-label="Buscar en el catálogo" th:value="${q}">
-                <button class="btn" type="submit">Buscar</button>
+            <form class="tn-search" action="/buscar" method="get" role="search">
+                <svg class="tn-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle>
+                    <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+                <input id="tn-buscar" class="form-control" type="search" name="q" placeholder="SKU, marca o nombre" aria-label="Buscar en el catálogo" th:value="${q}">
+                <kbd class="tn-kbd">Ctrl K</kbd>
+                <button class="visually-hidden" type="submit">Buscar</button>
             </form>
-            <div class="d-flex align-items-center gap-2 ms-lg-3 mt-2 mt-lg-0">
+            <div class="tn-nav-session">
                 <a sec:authorize="!isAuthenticated()" class="btn btn-outline-light btn-sm" href="/login">Entrar</a>
                 <span sec:authorize="isAuthenticated()" class="tn-user" sec:authentication="principal.nombre">Cuenta</span>
                 <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="m-0">
@@ -107,6 +112,78 @@
             if (enlace.getAttribute("href") === activa) {
                 enlace.classList.add("active");
             }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+                var campo = document.getElementById("tn-buscar");
+                if (!campo) {
+                    return;
+                }
+                event.preventDefault();
+                campo.focus();
+                campo.select();
+            }
+        });
+
+        document.querySelectorAll(".tn-sku-copy").forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                var sku = boton.getAttribute("data-sku") || "";
+                var etiqueta = boton.querySelector(".tn-sku-copy-label");
+                var marcado = false;
+                function marcar() {
+                    if (marcado) {
+                        return;
+                    }
+                    marcado = true;
+                    boton.classList.add("is-copied");
+                    if (etiqueta) {
+                        etiqueta.textContent = "Copiado";
+                    }
+                    window.setTimeout(function () {
+                        boton.classList.remove("is-copied");
+                        if (etiqueta) {
+                            etiqueta.textContent = "Copiar";
+                        }
+                    }, 1400);
+                }
+                var area = document.createElement("textarea");
+                area.value = sku;
+                area.setAttribute("readonly", "");
+                area.style.position = "fixed";
+                area.style.left = "-9999px";
+                document.body.appendChild(area);
+                area.select();
+                try {
+                    if (document.execCommand("copy")) {
+                        marcar();
+                    }
+                } catch (error) {
+                    /* el portapapeles moderno intenta después */
+                }
+                area.remove();
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(sku).then(marcar).catch(function () {});
+                }
+            });
+        });
+
+        document.querySelectorAll(".tn-stepper").forEach(function (stepper) {
+            var input = stepper.querySelector("input");
+            stepper.querySelectorAll("button").forEach(function (boton) {
+                boton.addEventListener("click", function () {
+                    var minimo = Number(input.min || 1);
+                    var maximo = Number(input.max || 99);
+                    var siguiente = Number(input.value || minimo) + Number(boton.getAttribute("data-step"));
+                    if (siguiente < minimo) {
+                        siguiente = minimo;
+                    }
+                    if (siguiente > maximo) {
+                        siguiente = maximo;
+                    }
+                    input.value = String(siguiente);
+                });
+            });
         });
     </script>
 </div>

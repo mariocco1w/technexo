@@ -41,25 +41,10 @@
         <a href="/catalogo">Ver catálogo completo</a>
     </header>
     <div th:if="${productos.empty}" class="alert alert-info">No hay productos activos registrados.</div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-        <div class="col" th:each="p : ${productos}">
-            <article class="card h-100 tn-product">
-                <div class="card-body">
-                    <div class="tn-product-top">
-                        <span class="tn-chip" th:text="${p.categoria}">Categoría</span>
-                        <span class="badge" th:classappend="${p.stockDisponible > 0} ? 'bg-success' : 'bg-secondary'"
-                              th:text="${p.stockDisponible > 0 ? 'Disponible: ' + p.stockDisponible : 'Sin stock'}">Disponible</span>
-                    </div>
-                    <p class="tn-sku" th:text="${p.sku}">SKU</p>
-                    <h3 class="card-title" th:text="${p.nombre}">Nombre</h3>
-                    <p class="tn-brand">Marca: <span th:text="${p.marca}"></span></p>
-                    <p class="tn-price" th:text="${p.precio + ' ' + p.moneda}">0.00 GTQ</p>
-                </div>
-                <div class="card-footer">
-                    <a th:href="@{'/producto/' + ${p.id}}" class="btn btn-primary btn-sm">Ver detalle</a>
-                </div>
-            </article>
-        </div>
+    <div class="tn-catalog-grid">
+        <th:block th:each="p : ${productos}">
+            <article th:replace="~{fragments/producto-card :: tarjeta(p=${p})}"></article>
+        </th:block>
     </div>
 </main>
 
